@@ -1,0 +1,89 @@
+{% extends 'base_simple.html' %}
+
+{% block title %}Recommandations - MovieRec{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4">
+            <i class="fas fa-star me-2"></i>Films Recommandés
+        </h1>
+        
+        {% if user.is_authenticated %}
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle me-2"></i>
+            Ces recommandations sont basées sur vos préférences et vos évaluations précédentes.
+        </div>
+        {% endif %}
+        
+        <!-- Résultats -->
+        {% if movies %}
+        <div class="row">
+            {% for movie in movies %}
+            <div class="col-md-4 col-lg-3 mb-4">
+                <div class="card h-100 shadow-sm">
+                    {% if movie.poster_url %}
+                    <img src="{{ movie.poster_url }}" class="card-img-top" alt="{{ movie.title }}" style="height: 400px; object-fit: cover;">
+                    {% else %}
+                    <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 400px;">
+                        <i class="fas fa-film fa-3x text-muted"></i>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title">{{ movie.title }}</h5>
+                        <p class="card-text text-muted small">{{ movie.release_year }}</p>
+                        
+                        <!-- Genres -->
+                        <div class="mb-2">
+                            {% for genre in movie.genres.all %}
+                            <span class="badge bg-secondary me-1">{{ genre.name }}</span>
+                            {% endfor %}
+                        </div>
+                        
+                        <!-- Rating -->
+                        <div class="mb-2">
+                            <i class="fas fa-star text-warning"></i>
+                            <span>{{ movie.vote_average|floatformat:1 }}/10</span>
+                        </div>
+                        
+                        <!-- Description -->
+                        <p class="card-text">
+                            {{ movie.overview|truncatewords:20 }}
+                        </p>
+                        
+                        <div class="mt-auto">
+                            <a href="{% url 'movies:movie_detail' movie.id %}" class="btn btn-primary">
+                                <i class="fas fa-eye me-1"></i>Voir détails
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        {% else %}
+        <div class="text-center py-5">
+            <i class="fas fa-star fa-3x text-muted mb-3"></i>
+            <h4>Aucune recommandation disponible</h4>
+            {% if user.is_authenticated %}
+            <p class="text-muted">
+                Commencez par noter quelques films pour recevoir des recommandations personnalisées.
+            </p>
+            <a href="{% url 'movies:movie_list' %}" class="btn btn-primary">
+                <i class="fas fa-search me-1"></i>Découvrir des films
+            </a>
+            {% else %}
+            <p class="text-muted">
+                Connectez-vous pour recevoir des recommandations personnalisées.
+            </p>
+            <a href="{% url 'admin:login' %}" class="btn btn-primary">
+                <i class="fas fa-sign-in-alt me-1"></i>Se connecter
+            </a>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

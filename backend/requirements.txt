@@ -1,0 +1,25 @@
+# Django Movie Recommendation System - Backend Requirements
+
+Django
+djangorestframework
+django-cors-headers
+python-decouple
+py2neo
+requests
+Pillow
+gunicorn
+whitenoise
+psycopg2-binary
+dj-database-url
+django-extensions
+django-debug-toolbar
+celery
+redis
+python-dotenv
+neo4j
+djongo
+dnspython
+certifi
+charset-normalizer
+idna
+urllib3

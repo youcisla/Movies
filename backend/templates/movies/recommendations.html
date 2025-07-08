@@ -1,0 +1,152 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Mes Recommandations - MovieRec{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1><i class="fas fa-star text-warning me-2"></i>Mes Recommandations</h1>
+            <p class="text-muted">Films sélectionnés spécialement pour vous</p>
+        </div>
+    </div>
+
+    <!-- Filtres de type de recommandation -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="btn-group" role="group">
+                        <a href="?type=hybrid" class="btn {% if recommendation_type == 'hybrid' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+                            <i class="fas fa-magic me-1"></i>Recommandations mixtes
+                        </a>
+                        <a href="?type=content" class="btn {% if recommendation_type == 'content' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+                            <i class="fas fa-tags me-1"></i>Basées sur le contenu
+                        </a>
+                        <a href="?type=collaborative" class="btn {% if recommendation_type == 'collaborative' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+                            <i class="fas fa-users me-1"></i>Collaboratives
+                        </a>
+                        <a href="?type=trending" class="btn {% if recommendation_type == 'trending' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+                            <i class="fas fa-fire me-1"></i>Tendances
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Explication du type de recommandation -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="alert alert-info" role="alert">
+                <i class="fas fa-info-circle me-2"></i>
+                {% if recommendation_type == 'hybrid' %}
+                    <strong>Recommandations mixtes :</strong> Combinaison de plusieurs algorithmes pour des suggestions optimales.
+                {% elif recommendation_type == 'content' %}
+                    <strong>Basées sur le contenu :</strong> Films similaires à ceux que vous avez aimés (genres, thèmes).
+                {% elif recommendation_type == 'collaborative' %}
+                    <strong>Collaboratives :</strong> Films appréciés par des utilisateurs ayant des goûts similaires.
+                {% elif recommendation_type == 'trending' %}
+                    <strong>Tendances :</strong> Films populaires et récents du moment.
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Grille des films recommandés -->
+    <div class="row">
+        {% for movie in movies %}
+        <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 mb-4">
+            {% include 'movies/movie_card.html' %}
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center py-5">
+                    <i class="fas fa-magic text-muted mb-3" style="font-size: 3rem;"></i>
+                    <h5>Pas encore de recommandations</h5>
+                    <p class="text-muted">Notez quelques films pour obtenir des recommandations personnalisées</p>
+                    <a href="{% url 'movies:movie_list' %}" class="btn btn-primary">
+                        <i class="fas fa-search me-2"></i>Découvrir des films
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if page_obj.paginator.num_pages > 1 %}
+    <div class="row">
+        <div class="col-12">
+            <nav aria-label="Pagination des recommandations">
+                <ul class="pagination justify-content-center">
+                    {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}&type={{ recommendation_type }}">
+                            <i class="fas fa-chevron-left"></i>
+                        </a>
+                    </li>
+                    {% endif %}
+                    
+                    {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                    <li class="page-item active">
+                        <span class="page-link">{{ num }}</span>
+                    </li>
+                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ num }}&type={{ recommendation_type }}">
+                            {{ num }}
+                        </a>
+                    </li>
+                    {% endif %}
+                    {% endfor %}
+                    
+                    {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}&type={{ recommendation_type }}">
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Conseils pour améliorer les recommandations -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <div class="card border-0 bg-light">
+                <div class="card-body">
+                    <h5><i class="fas fa-lightbulb text-warning me-2"></i>Conseils pour de meilleures recommandations</h5>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="d-flex align-items-center mb-2">
+                                <i class="fas fa-star text-warning me-2"></i>
+                                <span>Notez plus de films</span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="d-flex align-items-center mb-2">
+                                <i class="fas fa-bookmark text-primary me-2"></i>
+                                <span>Ajoutez des films à votre liste</span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="d-flex align-items-center mb-2">
+                                <i class="fas fa-comments text-info me-2"></i>
+                                <span>Laissez des commentaires détaillés</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

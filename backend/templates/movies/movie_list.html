@@ -1,0 +1,174 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Films - MovieRec{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Header avec filtres -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1><i class="fas fa-film me-2"></i>Films</h1>
+            
+            <!-- Filtres -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <form method="get" class="row g-3">
+                        <!-- Recherche -->
+                        <div class="col-md-4">
+                            <label class="form-label">Recherche</label>
+                            <input type="text" class="form-control" name="search" 
+                                   value="{{ current_search }}" placeholder="Titre du film...">
+                        </div>
+                        
+                        <!-- Genre -->
+                        <div class="col-md-3">
+                            <label class="form-label">Genre</label>
+                            <select class="form-select" name="genre">
+                                <option value="">Tous les genres</option>
+                                {% for genre in genres %}
+                                <option value="{{ genre.id }}" {% if current_genre == genre.id|stringformat:"s" %}selected{% endif %}>
+                                    {{ genre.name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <!-- Année -->
+                        <div class="col-md-2">
+                            <label class="form-label">Année</label>
+                            <input type="number" class="form-control" name="year" 
+                                   value="{{ current_year }}" min="1900" max="2024">
+                        </div>
+                        
+                        <!-- Tri -->
+                        <div class="col-md-2">
+                            <label class="form-label">Trier par</label>
+                            <select class="form-select" name="sort">
+                                <option value="-popularity" {% if current_sort == "-popularity" %}selected{% endif %}>
+                                    Popularité
+                                </option>
+                                <option value="-vote_average" {% if current_sort == "-vote_average" %}selected{% endif %}>
+                                    Note
+                                </option>
+                                <option value="-release_date" {% if current_sort == "-release_date" %}selected{% endif %}>
+                                    Date de sortie
+                                </option>
+                                <option value="title" {% if current_sort == "title" %}selected{% endif %}>
+                                    Titre
+                                </option>
+                            </select>
+                        </div>
+                        
+                        <!-- Boutons -->
+                        <div class="col-md-1">
+                            <label class="form-label">&nbsp;</label>
+                            <div class="d-flex gap-2">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                                <a href="{% url 'movies:movie_list' %}" class="btn btn-outline-secondary">
+                                    <i class="fas fa-times"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Résultats -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5>{{ movies|length }} film{{ movies|length|pluralize }} trouvé{{ movies|length|pluralize }}</h5>
+                
+                <!-- Informations de pagination -->
+                {% if page_obj.paginator.count %}
+                <small class="text-muted">
+                    {{ page_obj.start_index }} - {{ page_obj.end_index }} sur {{ page_obj.paginator.count }}
+                </small>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Grille des films -->
+    <div class="row">
+        {% for movie in movies %}
+        <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 mb-4">
+            {% include 'movies/movie_card.html' %}
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center py-5">
+                    <i class="fas fa-film text-muted mb-3" style="font-size: 3rem;"></i>
+                    <h5>Aucun film trouvé</h5>
+                    <p class="text-muted">Essayez de modifier vos critères de recherche</p>
+                    <a href="{% url 'movies:movie_list' %}" class="btn btn-primary">
+                        <i class="fas fa-refresh me-2"></i>Voir tous les films
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if page_obj.paginator.num_pages > 1 %}
+    <div class="row">
+        <div class="col-12">
+            <nav aria-label="Pagination des films">
+                <ul class="pagination justify-content-center">
+                    {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if current_search %}&search={{ current_search }}{% endif %}{% if current_genre %}&genre={{ current_genre }}{% endif %}{% if current_year %}&year={{ current_year }}{% endif %}{% if current_sort %}&sort={{ current_sort }}{% endif %}">
+                            <i class="fas fa-chevron-left"></i>
+                        </a>
+                    </li>
+                    {% endif %}
+                    
+                    {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                    <li class="page-item active">
+                        <span class="page-link">{{ num }}</span>
+                    </li>
+                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ num }}{% if current_search %}&search={{ current_search }}{% endif %}{% if current_genre %}&genre={{ current_genre }}{% endif %}{% if current_year %}&year={{ current_year }}{% endif %}{% if current_sort %}&sort={{ current_sort }}{% endif %}">
+                            {{ num }}
+                        </a>
+                    </li>
+                    {% endif %}
+                    {% endfor %}
+                    
+                    {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if current_search %}&search={{ current_search }}{% endif %}{% if current_genre %}&genre={{ current_genre }}{% endif %}{% if current_year %}&year={{ current_year }}{% endif %}{% if current_sort %}&sort={{ current_sort }}{% endif %}">
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Auto-submit form on select change
+    const selects = document.querySelectorAll('select[name="genre"], select[name="sort"]');
+    selects.forEach(select => {
+        select.addEventListener('change', function() {
+            this.form.submit();
+        });
+    });
+});
+</script>
+{% endblock %}

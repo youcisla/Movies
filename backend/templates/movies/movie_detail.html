@@ -1,0 +1,425 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ movie.title }} - MovieRec{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Header du film -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'movies:home' %}">Accueil</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'movies:movie_list' %}">Films</a></li>
+                    <li class="breadcrumb-item active">{{ movie.title }}</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Détails du film -->
+    <div class="row">
+        <!-- Poster -->
+        <div class="col-md-4 mb-4">
+            <div class="card border-0 shadow-sm">
+                {% if movie.poster_url %}
+                <img src="{{ movie.poster_url }}" class="card-img-top" alt="{{ movie.title }}" style="height: 600px; object-fit: cover;">
+                {% else %}
+                <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 600px;">
+                    <i class="fas fa-film text-muted" style="font-size: 5rem;"></i>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Informations principales -->
+        <div class="col-md-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h1 class="card-title">{{ movie.title }}</h1>
+                    
+                    {% if movie.original_title != movie.title %}
+                    <p class="text-muted">Titre original : {{ movie.original_title }}</p>
+                    {% endif %}
+
+                    <!-- Métadonnées -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <p><strong>Date de sortie :</strong> 
+                                {% if movie.release_date %}
+                                    {{ movie.release_date|date:"d F Y" }}
+                                {% else %}
+                                    Non spécifiée
+                                {% endif %}
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Durée :</strong> 
+                                {% if movie.runtime %}
+                                    {{ movie.runtime }} minutes
+                                {% else %}
+                                    Non spécifiée
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Genres -->
+                    <div class="mb-3">
+                        <strong>Genres :</strong>
+                        {% for genre in movie.genres.all %}
+                        <a href="{% url 'movies:movies_by_genre' genre.id %}" class="badge bg-secondary text-decoration-none me-1">
+                            {{ genre.name }}
+                        </a>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Évaluations -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <p><strong>Note TMDb :</strong> 
+                                <span class="badge bg-warning text-dark">
+                                    <i class="fas fa-star"></i> {{ movie.vote_average|floatformat:1 }}/10
+                                </span>
+                                <small class="text-muted">({{ movie.vote_count }} votes)</small>
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Note utilisateurs :</strong> 
+                                <span class="badge bg-info">
+                                    <i class="fas fa-users"></i> {{ average_rating|floatformat:1 }}/5
+                                </span>
+                                <small class="text-muted">({{ reviews_count }} avis)</small>
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Synopsis -->
+                    {% if movie.overview %}
+                    <div class="mb-4">
+                        <h5>Synopsis</h5>
+                        <p class="text-justify">{{ movie.overview }}</p>
+                    </div>
+                    {% endif %}
+
+                    <!-- Actions utilisateur -->
+                    {% if user.is_authenticated %}
+                    <div class="d-flex gap-2 mb-3">
+                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#reviewModal">
+                            <i class="fas fa-star me-1"></i>
+                            {% if user_review %}Modifier mon avis{% else %}Donner mon avis{% endif %}
+                        </button>
+                        
+                        <button class="btn btn-outline-secondary watchlist-btn" data-movie-id="{{ movie.id }}">
+                            <i class="fas fa-bookmark me-1"></i>
+                            {% if in_watchlist %}Retirer de ma liste{% else %}Ajouter à ma liste{% endif %}
+                        </button>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Films similaires -->
+    {% if similar_movies %}
+    <div class="row mt-5">
+        <div class="col-12">
+            <h3 class="mb-4">Films similaires</h3>
+            <div class="row">
+                {% for movie in similar_movies %}
+                <div class="col-lg-2 col-md-3 col-sm-4 col-6 mb-4">
+                    {% include 'movies/movie_card.html' %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Avis des utilisateurs -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <h3 class="mb-4">Avis des utilisateurs ({{ reviews_count }})</h3>
+            
+            {% if reviews %}
+            <div class="row">
+                {% for review in reviews %}
+                <div class="col-md-6 mb-3">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <div>
+                                    <h6 class="mb-1">{{ review.user.username }}</h6>
+                                    <div class="text-warning">
+                                        {% for i in "12345" %}
+                                        {% if forloop.counter <= review.rating %}
+                                        <i class="fas fa-star"></i>
+                                        {% else %}
+                                        <i class="far fa-star"></i>
+                                        {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                <small class="text-muted">{{ review.created_at|date:"d/m/Y" }}</small>
+                            </div>
+                            
+                            {% if review.comment %}
+                            <p class="card-text">{{ review.comment }}</p>
+                            {% endif %}
+                            
+                            {% if review.user == user %}
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#reviewModal">
+                                    <i class="fas fa-edit"></i> Modifier
+                                </button>
+                                <button class="btn btn-sm btn-outline-danger" onclick="deleteReview({{ review.id }})">
+                                    <i class="fas fa-trash"></i> Supprimer
+                                </button>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-comments text-muted mb-3" style="font-size: 3rem;"></i>
+                <p class="text-muted">Aucun avis pour le moment</p>
+                {% if user.is_authenticated %}
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#reviewModal">
+                    <i class="fas fa-star me-1"></i>Être le premier à donner un avis
+                </button>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Modal pour ajouter/modifier un avis -->
+{% if user.is_authenticated %}
+<div class="modal fade" id="reviewModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    {% if user_review %}Modifier mon avis{% else %}Donner mon avis{% endif %}
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="reviewForm">
+                    <div class="mb-3">
+                        <label class="form-label">Note</label>
+                        <div class="rating-input">
+                            {% for i in "12345" %}
+                            <span class="star" data-rating="{{ forloop.counter }}">
+                                <i class="far fa-star"></i>
+                            </span>
+                            {% endfor %}
+                        </div>
+                        <input type="hidden" id="ratingInput" name="rating" value="{% if user_review %}{{ user_review.rating }}{% endif %}">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="comment" class="form-label">Commentaire (optionnel)</label>
+                        <textarea class="form-control" id="comment" name="comment" rows="3" placeholder="Partagez votre avis sur ce film...">{% if user_review %}{{ user_review.comment }}{% endif %}</textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <button type="button" class="btn btn-primary" onclick="submitReview()">
+                    {% if user_review %}Modifier{% else %}Publier{% endif %}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Gestion des étoiles de notation
+document.addEventListener('DOMContentLoaded', function() {
+    const stars = document.querySelectorAll('.rating-input .star');
+    const ratingInput = document.getElementById('ratingInput');
+    
+    // Initialiser les étoiles si avis existant
+    if (ratingInput && ratingInput.value) {
+        updateStars(parseInt(ratingInput.value));
+    }
+    
+    stars.forEach(star => {
+        star.addEventListener('click', function() {
+            const rating = parseInt(this.dataset.rating);
+            ratingInput.value = rating;
+            updateStars(rating);
+        });
+        
+        star.addEventListener('mouseenter', function() {
+            const rating = parseInt(this.dataset.rating);
+            highlightStars(rating);
+        });
+    });
+    
+    document.querySelector('.rating-input').addEventListener('mouseleave', function() {
+        updateStars(parseInt(ratingInput.value) || 0);
+    });
+});
+
+function updateStars(rating) {
+    const stars = document.querySelectorAll('.rating-input .star i');
+    stars.forEach((star, index) => {
+        if (index < rating) {
+            star.className = 'fas fa-star text-warning';
+        } else {
+            star.className = 'far fa-star text-muted';
+        }
+    });
+}
+
+function highlightStars(rating) {
+    const stars = document.querySelectorAll('.rating-input .star i');
+    stars.forEach((star, index) => {
+        if (index < rating) {
+            star.className = 'fas fa-star text-warning';
+        } else {
+            star.className = 'far fa-star text-muted';
+        }
+    });
+}
+
+// Soumettre un avis
+function submitReview() {
+    const rating = document.getElementById('ratingInput').value;
+    const comment = document.getElementById('comment').value;
+    
+    if (!rating) {
+        alert('Veuillez sélectionner une note');
+        return;
+    }
+    
+    fetch(`/movies/{{ movie.id }}/review/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: JSON.stringify({
+            rating: parseInt(rating),
+            comment: comment
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        } else {
+            alert('Erreur lors de la soumission');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Erreur lors de la soumission');
+    });
+}
+
+// Supprimer un avis
+function deleteReview(reviewId) {
+    if (confirm('Êtes-vous sûr de vouloir supprimer cet avis ?')) {
+        fetch(`/reviews/${reviewId}/delete/`, {
+            method: 'DELETE',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken')
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Erreur lors de la suppression');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Erreur lors de la suppression');
+        });
+    }
+}
+
+// Gestion de la watchlist
+document.addEventListener('DOMContentLoaded', function() {
+    const watchlistBtn = document.querySelector('.watchlist-btn');
+    if (watchlistBtn) {
+        watchlistBtn.addEventListener('click', function() {
+            const movieId = this.dataset.movieId;
+            
+            fetch(`/movies/${movieId}/watchlist/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken')
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const icon = this.querySelector('i');
+                    const text = this.querySelector('text') || this.childNodes[2];
+                    
+                    if (data.in_watchlist) {
+                        this.innerHTML = '<i class="fas fa-bookmark me-1"></i>Retirer de ma liste';
+                        this.classList.add('btn-warning');
+                        this.classList.remove('btn-outline-secondary');
+                    } else {
+                        this.innerHTML = '<i class="fas fa-bookmark me-1"></i>Ajouter à ma liste';
+                        this.classList.add('btn-outline-secondary');
+                        this.classList.remove('btn-warning');
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+    }
+});
+
+// Fonction utilitaire pour récupérer le cookie CSRF
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+</script>
+
+<style>
+.rating-input .star {
+    cursor: pointer;
+    font-size: 1.5rem;
+    margin-right: 5px;
+}
+
+.rating-input .star:hover {
+    transform: scale(1.1);
+}
+
+.text-justify {
+    text-align: justify;
+}
+</style>
+{% endblock %}

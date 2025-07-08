@@ -1,0 +1,107 @@
+{% extends 'base_simple.html' %}
+
+{% block title %}Liste des Films - MovieRec{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4">
+            <i class="fas fa-film me-2"></i>Liste des Films
+        </h1>
+        
+        <!-- Barre de recherche -->
+        <div class="row mb-4">
+            <div class="col-md-8">
+                <form method="get" class="d-flex">
+                    <input class="form-control me-2" type="search" name="search" placeholder="Rechercher un film..." value="{{ request.GET.search }}">
+                    <button class="btn btn-outline-primary" type="submit">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Résultats -->
+        {% if movies %}
+        <div class="row">
+            {% for movie in movies %}
+            <div class="col-md-4 col-lg-3 mb-4">
+                <div class="card h-100 shadow-sm">
+                    {% if movie.poster_url %}
+                    <img src="{{ movie.poster_url }}" class="card-img-top" alt="{{ movie.title }}" style="height: 400px; object-fit: cover;">
+                    {% else %}
+                    <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 400px;">
+                        <i class="fas fa-film fa-3x text-muted"></i>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title">{{ movie.title }}</h5>
+                        <p class="card-text text-muted small">{{ movie.release_year }}</p>
+                        
+                        <!-- Genres -->
+                        <div class="mb-2">
+                            {% for genre in movie.genres.all %}
+                            <span class="badge bg-secondary me-1">{{ genre.name }}</span>
+                            {% endfor %}
+                        </div>
+                        
+                        <!-- Rating -->
+                        <div class="mb-2">
+                            <i class="fas fa-star text-warning"></i>
+                            <span>{{ movie.vote_average|floatformat:1 }}/10</span>
+                        </div>
+                        
+                        <!-- Description -->
+                        <p class="card-text">
+                            {{ movie.overview|truncatewords:20 }}
+                        </p>
+                        
+                        <div class="mt-auto">
+                            <a href="{% url 'movies:movie_detail' movie.id %}" class="btn btn-primary">
+                                <i class="fas fa-eye me-1"></i>Voir détails
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <!-- Pagination -->
+        {% if is_paginated %}
+        <nav aria-label="Navigation des pages">
+            <ul class="pagination justify-content-center">
+                {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">
+                        Précédent
+                    </a>
+                </li>
+                {% endif %}
+                
+                <li class="page-item active">
+                    <span class="page-link">{{ page_obj.number }} sur {{ page_obj.paginator.num_pages }}</span>
+                </li>
+                
+                {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">
+                        Suivant
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+        
+        {% else %}
+        <div class="text-center py-5">
+            <i class="fas fa-search fa-3x text-muted mb-3"></i>
+            <h4>Aucun film trouvé</h4>
+            <p class="text-muted">Essayez de modifier votre recherche ou d'ajouter des films à la base de données.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

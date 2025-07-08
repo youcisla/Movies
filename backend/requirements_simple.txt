@@ -1,0 +1,15 @@
+Django
+djongo
+requests
+neo4j
+gunicorn
+python-decouple
+py2neo
+pymongo
+dnspython
+certifi
+charset-normalizer
+idna
+urllib3
+Pillow
+whitenoise
