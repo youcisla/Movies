@@ -1,8 +1,8 @@
-# 🎬 Django Movie Recommendation System
+# Django Movie Recommendation System
 
 A modern, production-ready movie recommendation system built with Django, MongoDB Atlas, and Neo4j AuraDB.
 
-## 🎯 Project Overview
+## Project Overview
 
 This system provides intelligent movie recommendations using:
 - **MongoDB Atlas**: NoSQL document database for movies, reviews, and user data
@@ -11,14 +11,14 @@ This system provides intelligent movie recommendations using:
 - **Django**: Backend framework with REST API
 - **Bootstrap**: Modern, responsive frontend UI
 
-## 🚀 Features
+## Features
 
 ### Core Functionality
-- ✅ Movie browsing and search
-- ✅ User reviews and ratings
-- ✅ Intelligent recommendation algorithms
-- ✅ Admin dashboard for data management
-- ✅ Real-time analytics and insights
+- Movie browsing and search
+- User reviews and ratings
+- Intelligent recommendation algorithms
+- Admin dashboard for data management
+- Real-time analytics and insights
 
 ### Recommendation Algorithms
 1. **Content-Based Filtering**: Genre, director, cast similarity
@@ -31,7 +31,7 @@ This system provides intelligent movie recommendations using:
 - Review sentiment insights
 - User engagement metrics
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 DjangoBot/
@@ -55,7 +55,7 @@ DjangoBot/
 └── docs/                # Documentation
 ```
 
-## 🛠️ Technology Stack
+## Technology Stack
 
 ### Backend
 - **Django 4.2+**: Web framework
@@ -83,7 +83,7 @@ DjangoBot/
 - **WhiteNoise**: Static file serving
 - **Gunicorn**: WSGI server
 
-## 📋 Prerequisites
+## Prerequisites
 
 - Python 3.8+
 - MongoDB Atlas account
@@ -91,7 +91,7 @@ DjangoBot/
 - TMDb API key
 - Heroku account (for deployment)
 
-## 🔧 Installation & Setup
+## Installation & Setup
 
 ### 1. Clone the Repository
 ```bash
@@ -156,7 +156,7 @@ python manage.py runserver
 
 Visit `http://localhost:8000` to access the application.
 
-## 📊 API Endpoints
+## API Endpoints
 
 ### Movies
 - `GET /api/movies/` - List all movies
@@ -180,7 +180,7 @@ Visit `http://localhost:8000` to access the application.
 - `GET /api/analytics/ratings/` - Rating distribution
 - `GET /api/analytics/trends/` - Movie trends
 
-## 🎨 Frontend Features
+## Frontend Features
 
 ### User Interface
 - **Responsive Design**: Works on desktop, tablet, and mobile
@@ -196,7 +196,7 @@ Visit `http://localhost:8000` to access the application.
 - **Analytics**: Dashboard with charts and insights
 - **Admin**: Data management interface
 
-## 🔍 Data Processing
+## Data Processing
 
 ### ETL Pipeline
 1. **Extract**: Fetch movie data from TMDb API
@@ -222,7 +222,7 @@ class User:
 (Movie)-[:BELONGS_TO]->(Genre)
 ```
 
-## 📈 Analytics & Insights
+## Analytics & Insights
 
 ### MongoDB Aggregations
 - Top-rated movies by genre
@@ -236,7 +236,7 @@ class User:
 - Community detection
 - Centrality measures
 
-## 🚀 Deployment
+## Deployment
 
 ### Heroku Deployment
 1. **Prepare for Deployment**
@@ -267,7 +267,7 @@ class User:
    heroku run python data/etl_scripts/populate_movies.py
    ```
 
-## 🎯 Project Management
+## Project Management
 
 ### Trello Board
 [Link to Trello Board](https://trello.com/b/your-board-id)
@@ -280,14 +280,14 @@ class User:
 - **Done**: Completed features
 
 ### Task Categories
-- 🔧 Backend Development
-- 🎨 Frontend Development
-- 📊 Data Processing
-- 🧪 Testing
-- 🚀 Deployment
-- 📚 Documentation
+- Backend Development
+- Frontend Development
+- Data Processing
+- Testing
+- Deployment
+- Documentation
 
-## 📊 Presentation
+## Presentation
 
 ### Google Slides
 [Link to Presentation](https://docs.google.com/presentation/d/your-presentation-id)
@@ -302,7 +302,7 @@ class User:
 7. Deployment Strategy
 8. Future Enhancements
 
-## 🔬 Data Exploration
+## Data Exploration
 
 ### Jupyter Notebooks
 Located in `data/notebooks/`:
@@ -311,7 +311,7 @@ Located in `data/notebooks/`:
 - `03_analytics_insights.ipynb`: Statistical analysis
 - `04_performance_optimization.ipynb`: System optimization
 
-## 📝 Testing
+## Testing
 
 ### Running Tests
 ```bash
@@ -333,7 +333,7 @@ coverage report
 - **API Tests**: REST endpoint testing
 - **Database Tests**: Data integrity testing
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
 ### Common Issues
 1. **MongoDB Connection**: Check URI and network access
@@ -361,7 +361,7 @@ LOGGING = {
 }
 ```
 
-## 🤝 Contributing
+## Contributing
 
 1. Fork the repository
 2. Create a feature branch
@@ -369,11 +369,11 @@ LOGGING = {
 4. Add tests
 5. Submit a pull request
 
-## 📄 License
+## License
 
 This project is licensed under the MIT License. See LICENSE file for details.
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - TMDb for movie data
 - MongoDB and Neo4j for database services
