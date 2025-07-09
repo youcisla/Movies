@@ -1,0 +1,194 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ genre.name }} - Films - MovieRec{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'movies:home' %}">Accueil</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'movies:movie_list' %}">Films</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{ genre.name }}</li>
+                </ol>
+            </nav>
+            
+            <div class="d-flex align-items-center mb-3">
+                <i class="fas fa-tags me-3 text-primary" style="font-size: 2rem;"></i>
+                <div>
+                    <h1 class="mb-0">{{ genre.name }}</h1>
+                    <p class="text-muted mb-0">Découvrez les meilleurs films de {{ genre.name|lower }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Informations sur les résultats -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5>{{ movies|length }} film{{ movies|length|pluralize }} trouvé{{ movies|length|pluralize }}</h5>
+                
+                <!-- Informations de pagination -->
+                {% if page_obj.paginator.count %}
+                <small class="text-muted">
+                    {{ page_obj.start_index }} - {{ page_obj.end_index }} sur {{ page_obj.paginator.count }}
+                </small>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Grille des films -->
+    <div class="row">
+        {% for movie in movies %}
+        <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 mb-4">
+            {% include 'movies/movie_card.html' %}
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center py-5">
+                    <i class="fas fa-tags text-muted mb-3" style="font-size: 3rem;"></i>
+                    <h5>Aucun film trouvé</h5>
+                    <p class="text-muted">Aucun film de genre {{ genre.name }} n'a été trouvé dans notre base de données.</p>
+                    <a href="{% url 'movies:movie_list' %}" class="btn btn-primary">
+                        <i class="fas fa-film me-2"></i>Voir tous les films
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if page_obj.paginator.num_pages > 1 %}
+    <div class="row">
+        <div class="col-12">
+            <nav aria-label="Pagination des films">
+                <ul class="pagination justify-content-center">
+                    {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}">
+                            <i class="fas fa-chevron-left"></i>
+                        </a>
+                    </li>
+                    {% endif %}
+                    
+                    {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                    <li class="page-item active">
+                        <span class="page-link">{{ num }}</span>
+                    </li>
+                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ num }}">
+                            {{ num }}
+                        </a>
+                    </li>
+                    {% endif %}
+                    {% endfor %}
+                    
+                    {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}">
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Lien pour voir tous les films -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <h6 class="card-title"><i class="fas fa-film me-2"></i>Découvrir plus de films</h6>
+                    <p class="text-muted mb-3">Explorez notre collection complète de films</p>
+                    <div class="d-flex justify-content-center gap-2 flex-wrap">
+                        <a href="{% url 'movies:movie_list' %}" class="btn btn-primary">
+                            <i class="fas fa-film me-2"></i>Tous les films
+                        </a>
+                        <a href="{% url 'movies:home' %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-home me-2"></i>Accueil
+                        </a>
+                        {% if user.is_authenticated %}
+                        <a href="{% url 'movies:recommendations' %}" class="btn btn-outline-primary">
+                            <i class="fas fa-magic me-2"></i>Recommandations
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{% csrf_token %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Watchlist functionality
+    const watchlistBtns = document.querySelectorAll('.watchlist-btn');
+    watchlistBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const movieId = this.dataset.movieId;
+            toggleWatchlist(movieId, this);
+        });
+    });
+});
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+function toggleWatchlist(movieId, button) {
+    const csrftoken = getCookie('csrftoken');
+    
+    fetch(`/movies/${movieId}/watchlist/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': csrftoken,
+            'Content-Type': 'application/json',
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            const icon = button.querySelector('i');
+            if (data.in_watchlist) {
+                icon.className = 'fas fa-bookmark';
+                button.classList.remove('btn-outline-light');
+                button.classList.add('btn-warning');
+            } else {
+                icon.className = 'far fa-bookmark';
+                button.classList.remove('btn-warning');
+                button.classList.add('btn-outline-light');
+            }
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+}
+</script>
+{% endblock %}

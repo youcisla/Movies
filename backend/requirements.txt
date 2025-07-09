@@ -14,6 +14,8 @@ dj-database-url
 django-extensions
 django-debug-toolbar
 celery
+django-celery-results
+kombu
 redis
 python-dotenv
 neo4j

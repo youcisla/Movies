@@ -13,46 +13,29 @@ logger = logging.getLogger(__name__)
 def get_recommendations_for_user(user, limit=10, recommendation_type='hybrid'):
     """
     Get personalized recommendations for a user
-    Uses both SQLite data and MongoDB/Neo4j when available
+    Uses both MongoDB and Neo4j when available
     """
     try:
-        # Get user's highly rated movies (4+ stars)
-        user_reviews = Review.objects.filter(user=user, rating__gte=4)
+        # Fetch recommendations from Neo4j
+        from movie_recommender.neo4j_connection import get_neo4j_connection
         
-        if not user_reviews.exists():
-            # If no reviews, return popular movies
-            return get_popular_movies(limit)
+        neo4j_conn = get_neo4j_connection()
+        if neo4j_conn.is_connected:
+            neo4j_recommendations = neo4j_conn.get_user_recommendations(user.id, limit)
+            if neo4j_recommendations:
+                return neo4j_recommendations
+
+        # Fallback to MongoDB
+        from movie_recommender.mongodb_connection import get_mongodb_connection
         
-        # Get preferred genres from highly rated movies
-        preferred_genres = set()
-        for review in user_reviews:
-            for genre in review.movie.genres.all():
-                preferred_genres.add(genre)
-        
-        # Get movies user has already rated
-        rated_movie_ids = user_reviews.values_list('movie_id', flat=True)
-        
-        # Find movies from preferred genres that user hasn't rated
-        recommended_movies = Movie.objects.filter(
-            genres__in=preferred_genres
-        ).exclude(
-            id__in=rated_movie_ids
-        ).annotate(
-            avg_rating=Avg('review__rating')
-        ).order_by('-vote_average', '-popularity').distinct()[:limit]
-        
-        # Enhance with Neo4j recommendations if available
-        neo4j_recommendations = get_neo4j_recommendations(user, limit)
-        if neo4j_recommendations:
-            # Merge recommendations, prioritizing Neo4j suggestions
-            combined_movies = list(neo4j_recommendations)
-            for movie in recommended_movies:
-                if movie not in combined_movies and len(combined_movies) < limit:
-                    combined_movies.append(movie)
-            return combined_movies[:limit]
-        
-        return list(recommended_movies)
-        
+        mongodb_conn = get_mongodb_connection()
+        if mongodb_conn.is_connected:
+            movies_collection = mongodb_conn.get_collection('movies')
+            if movies_collection:
+                return list(movies_collection.find().limit(limit))
+
+        # Fallback to SQLite
+        return get_popular_movies(limit)
     except Exception as e:
         logger.error(f"Error getting recommendations: {e}")
         return get_popular_movies(limit)

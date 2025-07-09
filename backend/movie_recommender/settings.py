@@ -9,6 +9,12 @@ from pathlib import Path
 from decouple import config
 import dj_database_url
 
+# Try to import redis for fallback handling
+try:
+    import redis
+except ImportError:
+    redis = None
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -50,6 +56,7 @@ INSTALLED_APPS = [
     "corsheaders",
     "django_extensions",
     "debug_toolbar",
+    "django_celery_results",
     
     # Local apps
     "movies",
@@ -108,7 +115,7 @@ DATABASES = {
 # MongoDB configuration (pour usage direct avec pymongo si nécessaire)
 MONGODB_SETTINGS = {
     'host': MONGODB_URI,
-    'connect': False,
+    'connect': True,  # Ensure connection is established
 }
 
 # Neo4j Configuration
@@ -204,9 +211,25 @@ INTERNAL_IPS = [
     "127.0.0.1",
 ]
 
-# Celery Configuration (for background tasks)
-CELERY_BROKER_URL = config('REDIS_URL', default='redis://localhost:6379')
-CELERY_RESULT_BACKEND = config('REDIS_URL', default='redis://localhost:6379')
+# Celery Configuration (for background tasks) - with fallback
+if redis:
+    try:
+        # Test Redis connection for Celery
+        r = redis.Redis.from_url(config('REDIS_URL', default='redis://localhost:6379'))
+        r.ping()
+        
+        CELERY_BROKER_URL = config('REDIS_URL', default='redis://localhost:6379')
+        CELERY_RESULT_BACKEND = config('REDIS_URL', default='redis://localhost:6379')
+        
+    except (redis.ConnectionError, redis.TimeoutError):
+        # Fallback to database for Celery if Redis is not available
+        CELERY_BROKER_URL = 'django://'
+        CELERY_RESULT_BACKEND = 'django-db'
+else:
+    # Redis not available, use database
+    CELERY_BROKER_URL = 'django://'
+    CELERY_RESULT_BACKEND = 'django-db'
+
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
@@ -265,20 +288,46 @@ LOGGING = {
 LOG_DIR = BASE_DIR / 'logs'
 LOG_DIR.mkdir(exist_ok=True)
 
-# Cache Configuration
-CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.redis.RedisCache',
-        'LOCATION': config('REDIS_URL', default='redis://127.0.0.1:6379/1'),
-        'OPTIONS': {
-            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+# Cache Configuration - Fallback to database if Redis is not available
+if redis:
+    try:
+        # Test Redis connection
+        r = redis.Redis.from_url(config('REDIS_URL', default='redis://127.0.0.1:6379/1'))
+        r.ping()
+        
+        CACHES = {
+            'default': {
+                'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+                'LOCATION': config('REDIS_URL', default='redis://127.0.0.1:6379/1'),
+            }
+        }
+        
+        # Session Configuration
+        SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
+        SESSION_CACHE_ALIAS = 'default'
+        
+    except (redis.ConnectionError, redis.TimeoutError):
+        # Fallback to database cache and sessions if Redis is not available
+        CACHES = {
+            'default': {
+                'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+                'LOCATION': 'django_cache_table',
+            }
+        }
+        
+        # Session Configuration - use database sessions
+        SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+else:
+    # Redis not available, use database
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+            'LOCATION': 'django_cache_table',
         }
     }
-}
-
-# Session Configuration
-SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
-SESSION_CACHE_ALIAS = 'default'
+    
+    # Session Configuration - use database sessions
+    SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 
 # Email Configuration
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'

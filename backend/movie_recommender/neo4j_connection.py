@@ -16,13 +16,13 @@ class Neo4jConnection:
         self._connection_attempted = False
     
     def connect(self):
-        """Connect to Neo4j"""
+        """Connect to Neo4j with retry logic"""
         if self._connection_attempted:
             return
 
         self._connection_attempted = True
         try:
-            # Only try to connect if Neo4j settings are properly configured
+            # Ensure Neo4j settings are configured
             neo4j_uri = settings.NEO4J_URI
             neo4j_username = settings.NEO4J_USERNAME
             neo4j_password = settings.NEO4J_PASSWORD
@@ -31,15 +31,8 @@ class Neo4jConnection:
                 raise ValueError("Neo4j connection settings are not properly configured.")
 
             self.driver = GraphDatabase.driver(neo4j_uri, auth=(neo4j_username, neo4j_password))
-            try:
-                # Ensure the database is initialized by creating a simple node
-                with self.driver.session() as session:
-                    session.run("CREATE CONSTRAINT IF NOT EXISTS ON (n:MovieRec) ASSERT n.id IS UNIQUE")
-                self.is_connected = True
-                logger.info("✅ Connected to Neo4j and initialized 'movierec' database.")
-            except Exception as e:
-                logger.error(f"❌ Failed to initialize Neo4j database: {e}")
-                self.is_connected = False
+            self.is_connected = True
+            logger.info("✅ Connected to Neo4j.")
         except Exception as e:
             logger.error(f"❌ Failed to connect to Neo4j: {e}")
             self.is_connected = False

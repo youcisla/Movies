@@ -408,7 +408,7 @@ def login_view(request):
         if user is not None:
             login(request, user)
             messages.success(request, 'Connexion réussie!')
-            return redirect('home')
+            return redirect('movies:home')
         else:
             messages.error(request, 'Nom d\'utilisateur ou mot de passe incorrect.')
     
@@ -419,7 +419,7 @@ def logout_view(request):
     """Déconnexion"""
     logout(request)
     messages.success(request, 'Déconnexion réussie!')
-    return redirect('home')
+    return redirect('movies:home')
 
 
 from django.contrib.auth.forms import UserCreationForm
@@ -433,7 +433,7 @@ def register_view(request):
             username = form.cleaned_data.get('username')
             messages.success(request, f'Compte créé pour {username}!')
             login(request, user)
-            return redirect('home')
+            return redirect('movies:home')
     else:
         form = UserCreationForm()
     

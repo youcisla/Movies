@@ -141,14 +141,22 @@ class MovieInteraction(models.Model):
 
 @receiver(post_save, sender=Movie)
 def movie_post_save(sender, instance, **kwargs):
-    """Sync movie to MongoDB when saved"""
+    """Sync movie to MongoDB and Neo4j when saved"""
     try:
-        from .mongodb_sync import sync_movie_to_mongodb
-        sync_movie_to_mongodb(instance)
-    except ImportError:
-        logger.debug("MongoDB sync not available")
+        from movie_recommender.mongodb_connection import get_movies_collection
+        from movie_recommender.neo4j_connection import get_neo4j_connection
+
+        # Sync to MongoDB
+        movies_collection = get_movies_collection()
+        if movies_collection:
+            movies_collection.replace_one({'_id': instance.id}, instance.to_dict(), upsert=True)
+
+        # Sync to Neo4j
+        neo4j_conn = get_neo4j_connection()
+        if neo4j_conn.is_connected:
+            neo4j_conn.create_movie_node(instance.id, instance.title, [genre.name for genre in instance.genres.all()])
     except Exception as e:
-        logger.error(f"Error syncing movie to MongoDB: {e}")
+        logger.error(f"Error syncing movie: {e}")
 
 @receiver(post_save, sender=Review)
 def review_post_save(sender, instance, **kwargs):
