@@ -1,6 +1,6 @@
 """
 Recommendation engine for movie recommendations
-Integrates with MongoDB and Neo4j for enhanced recommendations
+Integrates with Neo4j for enhanced recommendations
 """
 from .models import Movie, Review, Genre, MovieInteraction
 from django.contrib.auth.models import User
@@ -378,7 +378,7 @@ def get_movies_by_genre(genre_id, limit=20):
 def record_interaction(user, movie, interaction_type):
     """
     Record user interaction with a movie
-    Stores in both SQLite and MongoDB
+    Stores in both SQLite and Neo4j
     """
     try:
         # Store in SQLite
@@ -388,39 +388,11 @@ def record_interaction(user, movie, interaction_type):
             interaction_type=interaction_type
         )
         
-        # Store in MongoDB if available
-        sync_interaction_to_mongodb(user, movie, interaction_type)
-        
         # Store in Neo4j if available
         sync_interaction_to_neo4j(user, movie, interaction_type)
         
     except Exception as e:
         logger.error(f"Error recording interaction: {e}")
-
-
-def sync_interaction_to_mongodb(user, movie, interaction_type):
-    """
-    Sync interaction to MongoDB
-    """
-    try:
-        from movie_recommender.mongodb_connection import get_interactions_collection
-        
-        collection = get_interactions_collection()
-        if collection is None:
-            return
-        
-        interaction_doc = {
-            'user_id': user.id,
-            'movie_id': movie.id,
-            'interaction_type': interaction_type,
-            'timestamp': user.last_login or user.date_joined
-        }
-        
-        collection.insert_one(interaction_doc)
-        logger.debug(f"Synced interaction to MongoDB: {user.username} {interaction_type} {movie.title}")
-        
-    except Exception as e:
-        logger.error(f"Error syncing interaction to MongoDB: {e}")
 
 
 def sync_interaction_to_neo4j(user, movie, interaction_type):
@@ -584,6 +556,28 @@ def sync_user_watchlist_to_neo4j(user, movie):
         
     except Exception as e:
         logger.error(f"Error syncing watchlist to Neo4j: {e}")
+
+
+def remove_user_watchlist_from_neo4j(user, movie):
+    """
+    Supprime la relation WANTS_TO_WATCH dans Neo4j
+    """
+    try:
+        from movie_recommender.neo4j_connection import get_neo4j_connection
+        neo4j_conn = get_neo4j_connection()
+        if not neo4j_conn.is_connected:
+            return
+        query = """
+        MATCH (u:User {django_id: $user_id})-[r:WANTS_TO_WATCH]->(m:Movie {django_id: $movie_id})
+        DELETE r
+        """
+        neo4j_conn.run_query(query, {
+            "user_id": user.id,
+            "movie_id": movie.id
+        })
+    except Exception as e:
+        import logging
+        logging.getLogger(__name__).error(f"Error removing watchlist from Neo4j: {e}")
 
 
 def get_similar_movies(movie, limit=6):

@@ -1,0 +1,7 @@
+Les fichiers suivants liés à MongoDB ont été supprimés du projet :
+- backend/movie_recommender/mongodb_connection.py
+- backend/movies/mongodb_sync.py
+
+Si tu utilises git, pense à faire :
+git rm backend/movie_recommender/mongodb_connection.py
+git rm backend/movies/mongodb_sync.py

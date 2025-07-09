@@ -193,13 +193,13 @@ def recommendations(request):
     paginator = Paginator(recommended_movies, 12)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
-    
+
     context = {
         'movies': page_obj,
         'recommendation_type': recommendation_type,
         'page_obj': page_obj,
+        'use_neo4j': use_neo4j,
     }
-    
     return render(request, 'movies/recommendations.html', context)
 
 
@@ -282,14 +282,13 @@ def watchlist(request):
 def toggle_watchlist(request, movie_id):
     """Ajouter ou supprimer un film de la watchlist"""
     movie = get_object_or_404(Movie, id=movie_id)
-    
     watchlist_item, created = Watchlist.objects.get_or_create(
         user=request.user,
         movie=movie
     )
-    
     if not created:
         watchlist_item.delete()
+        remove_user_watchlist_from_neo4j(request.user, movie)  # Sync suppression Neo4j
         in_watchlist = False
     else:
         in_watchlist = True
@@ -444,6 +443,45 @@ def api_recommendations(request):
             'recommendation_score': movie_data.get('recommendation_score', 0.0)
         })
     
+    return JsonResponse({'movies': data})
+
+
+@csrf_exempt
+@login_required
+def api_neo4j_recommendations(request):
+    """API pour récupérer les recommandations depuis Neo4j"""
+    limit = int(request.GET.get('limit', 20))
+    user_id = request.user.id
+    neo4j_conn = get_neo4j_connection()
+    recommendations = neo4j_conn.get_user_recommendations(user_id, limit=limit)
+    # Formatage des résultats Neo4j (liste de dicts)
+    data = []
+    for rec in recommendations:
+        data.append({
+            'id': rec.get('movie_id'),
+            'title': rec.get('title'),
+        })
+    return JsonResponse({'movies': data})
+
+
+@csrf_exempt
+def api_neo4j_movies(request):
+    """API pour lister tous les films depuis Neo4j"""
+    limit = int(request.GET.get('limit', 100))
+    neo4j_conn = get_neo4j_connection()
+    query = """
+    MATCH (m:Movie)
+    RETURN m.id as id, m.title as title
+    ORDER BY m.title ASC
+    LIMIT $limit
+    """
+    results = neo4j_conn.run_query(query, {"limit": limit})
+    data = []
+    for rec in results:
+        data.append({
+            'id': rec.get('id'),
+            'title': rec.get('title'),
+        })
     return JsonResponse({'movies': data})
 
 

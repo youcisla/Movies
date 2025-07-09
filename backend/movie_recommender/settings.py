@@ -116,12 +116,6 @@ DATABASES = {
     }
 }
 
-# MongoDB configuration (pour usage direct avec pymongo si nécessaire)
-MONGODB_SETTINGS = {
-    'host': MONGODB_URI,
-    'connect': True,  # Ensure connection is established
-}
-
 # Neo4j Configuration
 NEO4J_SETTINGS = {
     'uri': NEO4J_URI,
