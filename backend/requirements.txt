@@ -1,10 +1,9 @@
-# Django Movie Recommendation System - Backend Requirements
+# Django Movie Recommendation System - Neo4j Only Version
 
 Django
 djangorestframework
 django-cors-headers
 python-decouple
-py2neo
 requests
 Pillow
 gunicorn
@@ -18,9 +17,16 @@ django-celery-results
 kombu
 redis
 python-dotenv
-neo4j
+
+# Neo4j Dependencies (Primary Database)
+neo4j>=5.0.0
+py2neo
+
+# Optional: MongoDB (can be removed for Neo4j-only)
 pymongo
 dnspython
+
+# Standard dependencies
 certifi
 charset-normalizer
 idna

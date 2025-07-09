@@ -5,7 +5,7 @@ from django.core.management.base import BaseCommand
 from django.contrib.auth.models import User
 from movies.models import Movie, Review, Watchlist
 from movies.mongodb_sync import sync_movie_to_mongodb, sync_review_to_mongodb, sync_user_to_mongodb
-from movie_recommender.neo4j_connection import neo4j_conn
+from movie_recommender.neo4j_connection import get_neo4j_connection
 import logging
 
 logger = logging.getLogger(__name__)
@@ -57,6 +57,7 @@ class Command(BaseCommand):
         """Sync all users to MongoDB and Neo4j"""
         self.stdout.write('👥 Synchronisation des utilisateurs...')
         
+        neo4j_conn = get_neo4j_connection()
         users = User.objects.all()
         for user in users:
             try:
@@ -79,6 +80,7 @@ class Command(BaseCommand):
         """Sync all movies to MongoDB and Neo4j"""
         self.stdout.write('🎬 Synchronisation des films...')
         
+        neo4j_conn = get_neo4j_connection()
         movies = Movie.objects.all()
         for movie in movies:
             try:
@@ -102,6 +104,7 @@ class Command(BaseCommand):
         """Sync all reviews to MongoDB and Neo4j"""
         self.stdout.write('⭐ Synchronisation des avis...')
         
+        neo4j_conn = get_neo4j_connection()
         reviews = Review.objects.all()
         for review in reviews:
             try:
@@ -129,6 +132,7 @@ class Command(BaseCommand):
         """Sync all watchlist items to Neo4j"""
         self.stdout.write('📚 Synchronisation des listes de films...')
         
+        neo4j_conn = get_neo4j_connection()
         watchlist_items = Watchlist.objects.all()
         for item in watchlist_items:
             try:

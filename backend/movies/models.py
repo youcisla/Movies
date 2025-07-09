@@ -70,6 +70,26 @@ class Movie(models.Model):
             return sum([review.rating for review in reviews]) / len(reviews)
         return 0
     
+    def to_dict(self):
+        """Convert movie to dictionary for MongoDB storage"""
+        return {
+            '_id': self.id,
+            'tmdb_id': self.tmdb_id,
+            'title': self.title,
+            'original_title': self.original_title,
+            'overview': self.overview,
+            'release_date': self.release_date.isoformat() if self.release_date else None,
+            'runtime': self.runtime,
+            'poster_path': self.poster_path,
+            'backdrop_path': self.backdrop_path,
+            'vote_average': self.vote_average,
+            'vote_count': self.vote_count,
+            'popularity': self.popularity,
+            'genres': [genre.name for genre in self.genres.all()],
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'updated_at': self.updated_at.isoformat() if self.updated_at else None,
+        }
+    
     class Meta:
         ordering = ['-created_at']
 
@@ -146,15 +166,34 @@ def movie_post_save(sender, instance, **kwargs):
         from movie_recommender.mongodb_connection import get_movies_collection
         from movie_recommender.neo4j_connection import get_neo4j_connection
 
-        # Sync to MongoDB
-        movies_collection = get_movies_collection()
-        if movies_collection:
-            movies_collection.replace_one({'_id': instance.id}, instance.to_dict(), upsert=True)
+        # Sync to MongoDB - fix collection checking
+        try:
+            movies_collection = get_movies_collection()
+            if movies_collection is not None:
+                movies_collection.replace_one({'_id': instance.id}, instance.to_dict(), upsert=True)
+        except Exception as mongo_e:
+            logger.debug(f"MongoDB sync skipped: {mongo_e}")
 
-        # Sync to Neo4j
+        # Sync to Neo4j with complete movie data
         neo4j_conn = get_neo4j_connection()
         if neo4j_conn.is_connected:
-            neo4j_conn.create_movie_node(instance.id, instance.title, [genre.name for genre in instance.genres.all()])
+            movie_data = {
+                "overview": instance.overview,
+                "release_date": instance.release_date.isoformat() if instance.release_date else "",
+                "runtime": instance.runtime or 0,
+                "poster_path": instance.poster_path,
+                "backdrop_path": instance.backdrop_path,
+                "vote_average": instance.vote_average,
+                "vote_count": instance.vote_count,
+                "popularity": instance.popularity,
+                "tmdb_id": instance.tmdb_id
+            }
+            neo4j_conn.create_movie_node(
+                instance.id, 
+                instance.title, 
+                [genre.name for genre in instance.genres.all()],
+                movie_data
+            )
     except Exception as e:
         logger.error(f"Error syncing movie: {e}")
 

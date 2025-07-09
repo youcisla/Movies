@@ -8,12 +8,16 @@ import os
 from pathlib import Path
 from decouple import config
 import dj_database_url
+from dotenv import load_dotenv
 
 # Try to import redis for fallback handling
 try:
     import redis
 except ImportError:
     redis = None
+
+# Load environment variables from the .env file
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -31,14 +35,14 @@ DEBUG = config('DEBUG', default=True, cast=bool)
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1', cast=lambda v: [s.strip() for s in v.split(',')])
 
 # Environment Variables
-TMDB_API_KEY = config('TMDB_API_KEY')
-TMDB_ACCESS_TOKEN = config('TMDB_ACCESS_TOKEN')
-TMDB_BASE_URL = config('TMDB_BASE_URL')
-MONGODB_URI = config('MONGODB_URI')
-NEO4J_URI = config('NEO4J_URI')
-NEO4J_USERNAME = config('NEO4J_USERNAME')  # Correcting the environment variable reference
-NEO4J_PASSWORD = config('NEO4J_PASSWORD')
-NEO4J_DATABASE = config('NEO4J_DATABASE', default='movierec')
+TMDB_API_KEY = os.getenv('TMDB_API_KEY')
+TMDB_ACCESS_TOKEN = os.getenv('TMDB_ACCESS_TOKEN')
+TMDB_BASE_URL = os.getenv('TMDB_BASE_URL')
+MONGODB_URI = os.getenv('MONGODB_URI')
+NEO4J_URI = os.getenv('NEO4J_URI')
+NEO4J_USERNAME = os.getenv('NEO4J_USERNAME')
+NEO4J_PASSWORD = os.getenv('NEO4J_PASSWORD')
+NEO4J_DATABASE = os.getenv('NEO4J_DATABASE', 'neo4j')
 
 
 # Application definition

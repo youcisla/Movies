@@ -99,17 +99,3 @@ def get_interactions_collection():
     if collection is None:
         logger.warning("MongoDB not available, returning None for interactions collection")
     return collection
-    """Get users collection"""
-    conn = get_mongodb_connection()
-    collection = conn.get_collection('users')
-    if collection is None:
-        logger.warning("MongoDB not available, returning None for users collection")
-    return collection
-
-def get_interactions_collection():
-    """Get user interactions collection"""
-    conn = get_mongodb_connection()
-    collection = conn.get_collection('interactions')
-    if collection is None:
-        logger.warning("MongoDB not available, returning None for interactions collection")
-    return collection
