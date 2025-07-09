@@ -41,7 +41,7 @@ class DatabaseConnections:
                 raise
         return self._mongodb_client
     
-    def get_mongodb_database(self, db_name='moviedb'):
+    def get_mongodb_database(self, db_name='movierec'):
         """Get MongoDB database"""
         client = self.get_mongodb_client()
         return client[db_name]

@@ -1,263 +1,460 @@
+"""
+Recommendation engine for movie recommendations
+Integrates with MongoDB and Neo4j for enhanced recommendations
+"""
+from .models import Movie, Review, Genre, MovieInteraction
 from django.contrib.auth.models import User
-from django.db.models import Q, Avg, Count
-from .models import Movie, Review, UserPreference, MovieInteraction, Genre
-from collections import defaultdict, Counter
+from django.db.models import Avg, Count, Q
 import logging
-from datetime import datetime, timedelta
 
 logger = logging.getLogger(__name__)
 
 
-class RecommendationEngine:
-    """Moteur de recommandation pour les films"""
-    
-    def __init__(self, user):
-        self.user = user
-        self.user_reviews = Review.objects.filter(user=user)
-        self.user_interactions = MovieInteraction.objects.filter(user=user)
-        self.user_preferences = UserPreference.objects.filter(user=user).first()
-    
-    def get_user_favorite_genres(self):
-        """Récupère les genres préférés de l'utilisateur"""
-        favorite_genres = set()
+def get_recommendations_for_user(user, limit=10, recommendation_type='hybrid'):
+    """
+    Get personalized recommendations for a user
+    Uses both SQLite data and MongoDB/Neo4j when available
+    """
+    try:
+        # Get user's highly rated movies (4+ stars)
+        user_reviews = Review.objects.filter(user=user, rating__gte=4)
         
-        # Genres des films bien notés
-        high_rated_movies = self.user_reviews.filter(rating__gte=4)
-        for review in high_rated_movies:
-            favorite_genres.update(review.movie.genres.all())
+        if not user_reviews.exists():
+            # If no reviews, return popular movies
+            return get_popular_movies(limit)
         
-        # Genres des préférences utilisateur
-        if self.user_preferences:
-            favorite_genres.update(self.user_preferences.favorite_genres.all())
+        # Get preferred genres from highly rated movies
+        preferred_genres = set()
+        for review in user_reviews:
+            for genre in review.movie.genres.all():
+                preferred_genres.add(genre)
         
-        return list(favorite_genres)
-    
-    def get_similar_users(self, limit=10):
-        """Trouve des utilisateurs avec des goûts similaires"""
-        # Utilisateurs qui ont noté les mêmes films
-        user_movies = set(self.user_reviews.values_list('movie_id', flat=True))
+        # Get movies user has already rated
+        rated_movie_ids = user_reviews.values_list('movie_id', flat=True)
         
-        if not user_movies:
-            return []
-        
-        # Trouve les utilisateurs qui ont noté les mêmes films
-        similar_users = defaultdict(int)
-        
-        for movie_id in user_movies:
-            other_reviews = Review.objects.filter(
-                movie_id=movie_id
-            ).exclude(user=self.user)
-            
-            for review in other_reviews:
-                # Calcule la similarité basée sur les notes
-                user_rating = self.user_reviews.filter(movie_id=movie_id).first().rating
-                if abs(user_rating - review.rating) <= 1:  # Tolérance de 1 point
-                    similar_users[review.user_id] += 1
-        
-        # Trie par similarité
-        sorted_users = sorted(similar_users.items(), key=lambda x: x[1], reverse=True)
-        
-        return [User.objects.get(id=user_id) for user_id, _ in sorted_users[:limit]]
-    
-    def get_content_based_recommendations(self, limit=10):
-        """Recommandations basées sur le contenu"""
-        recommendations = []
-        favorite_genres = self.get_user_favorite_genres()
-        
-        if not favorite_genres:
-            return Movie.objects.filter(vote_average__gte=7.0).order_by('-popularity')[:limit]
-        
-        # Films des genres préférés non encore vus
-        watched_movies = set(self.user_reviews.values_list('movie_id', flat=True))
-        
-        # Films populaires des genres préférés
-        for genre in favorite_genres:
-            movies = Movie.objects.filter(
-                genres=genre
-            ).exclude(
-                id__in=watched_movies
-            ).order_by('-vote_average', '-popularity')[:5]
-            
-            recommendations.extend(movies)
-        
-        # Supprime les doublons et limite
-        seen = set()
-        unique_recommendations = []
-        
-        for movie in recommendations:
-            if movie.id not in seen:
-                seen.add(movie.id)
-                unique_recommendations.append(movie)
-                if len(unique_recommendations) >= limit:
-                    break
-        
-        return unique_recommendations
-    
-    def get_collaborative_recommendations(self, limit=10):
-        """Recommandations collaboratives"""
-        similar_users = self.get_similar_users()
-        
-        if not similar_users:
-            return []
-        
-        # Films bien notés par des utilisateurs similaires
-        watched_movies = set(self.user_reviews.values_list('movie_id', flat=True))
-        recommendations = defaultdict(list)
-        
-        for similar_user in similar_users:
-            high_rated_reviews = Review.objects.filter(
-                user=similar_user,
-                rating__gte=4
-            ).exclude(movie_id__in=watched_movies)
-            
-            for review in high_rated_reviews:
-                recommendations[review.movie].append(review.rating)
-        
-        # Calcule le score moyen pour chaque film
-        scored_movies = []
-        for movie, ratings in recommendations.items():
-            avg_rating = sum(ratings) / len(ratings)
-            scored_movies.append((movie, avg_rating, len(ratings)))
-        
-        # Trie par score moyen et nombre de votes
-        scored_movies.sort(key=lambda x: (x[1], x[2]), reverse=True)
-        
-        return [movie for movie, _, _ in scored_movies[:limit]]
-    
-    def get_trending_recommendations(self, limit=10):
-        """Recommandations basées sur les tendances"""
-        # Films populaires récents
-        recent_date = datetime.now().date() - timedelta(days=30)
-        
-        trending_movies = Movie.objects.filter(
-            release_date__gte=recent_date
-        ).order_by('-popularity', '-vote_average')[:limit]
-        
-        if trending_movies.count() < limit:
-            # Complète avec des films populaires
-            additional_movies = Movie.objects.exclude(
-                id__in=[m.id for m in trending_movies]
-            ).order_by('-popularity')[:limit - trending_movies.count()]
-            
-            trending_movies = list(trending_movies) + list(additional_movies)
-        
-        return trending_movies
-    
-    def get_hybrid_recommendations(self, limit=20):
-        """Recommandations hybrides combinant plusieurs approches"""
-        recommendations = []
-        
-        # 50% basé sur le contenu
-        content_based = self.get_content_based_recommendations(limit // 2)
-        recommendations.extend(content_based)
-        
-        # 30% collaboratif
-        collaborative = self.get_collaborative_recommendations(limit // 3)
-        recommendations.extend(collaborative)
-        
-        # 20% tendances
-        trending = self.get_trending_recommendations(limit // 5)
-        recommendations.extend(trending)
-        
-        # Supprime les doublons
-        seen = set()
-        unique_recommendations = []
-        
-        for movie in recommendations:
-            if movie.id not in seen:
-                seen.add(movie.id)
-                unique_recommendations.append(movie)
-                if len(unique_recommendations) >= limit:
-                    break
-        
-        # Complète avec des films populaires si nécessaire
-        if len(unique_recommendations) < limit:
-            additional_movies = Movie.objects.exclude(
-                id__in=[m.id for m in unique_recommendations]
-            ).order_by('-vote_average', '-popularity')[:limit - len(unique_recommendations)]
-            
-            unique_recommendations.extend(additional_movies)
-        
-        return unique_recommendations[:limit]
-    
-    def get_genre_recommendations(self, genre_id, limit=10):
-        """Recommandations pour un genre spécifique"""
-        try:
-            genre = Genre.objects.get(id=genre_id)
-        except Genre.DoesNotExist:
-            return []
-        
-        # Films non vus de ce genre
-        watched_movies = set(self.user_reviews.values_list('movie_id', flat=True))
-        
-        movies = Movie.objects.filter(
-            genres=genre
+        # Find movies from preferred genres that user hasn't rated
+        recommended_movies = Movie.objects.filter(
+            genres__in=preferred_genres
         ).exclude(
-            id__in=watched_movies
-        ).order_by('-vote_average', '-popularity')[:limit]
-        
-        return movies
-    
-    def get_similar_movies(self, movie_id, limit=10):
-        """Trouve des films similaires à un film donné"""
-        try:
-            movie = Movie.objects.get(id=movie_id)
-        except Movie.DoesNotExist:
-            return []
-        
-        # Films du même genre
-        similar_movies = Movie.objects.filter(
-            genres__in=movie.genres.all()
-        ).exclude(
-            id=movie_id
+            id__in=rated_movie_ids
         ).annotate(
-            genre_count=Count('genres')
-        ).order_by('-genre_count', '-vote_average')[:limit]
+            avg_rating=Avg('review__rating')
+        ).order_by('-vote_average', '-popularity').distinct()[:limit]
         
-        return similar_movies
+        # Enhance with Neo4j recommendations if available
+        neo4j_recommendations = get_neo4j_recommendations(user, limit)
+        if neo4j_recommendations:
+            # Merge recommendations, prioritizing Neo4j suggestions
+            combined_movies = list(neo4j_recommendations)
+            for movie in recommended_movies:
+                if movie not in combined_movies and len(combined_movies) < limit:
+                    combined_movies.append(movie)
+            return combined_movies[:limit]
+        
+        return list(recommended_movies)
+        
+    except Exception as e:
+        logger.error(f"Error getting recommendations: {e}")
+        return get_popular_movies(limit)
 
 
-def get_recommendations_for_user(user, recommendation_type='hybrid', limit=20):
-    """Fonction principale pour obtenir des recommandations"""
-    engine = RecommendationEngine(user)
+def get_neo4j_recommendations(user, limit=10):
+    """
+    Get recommendations from Neo4j graph database
+    """
+    try:
+        from movie_recommender.neo4j_connection import get_neo4j_connection
+        
+        neo4j_conn = get_neo4j_connection()
+        if not neo4j_conn.is_connected:
+            return []
+        
+        # Cypher query to find recommendations based on user similarity
+        query = """
+        MATCH (u:User {django_id: $user_id})-[:LIKES]->(m:Movie)<-[:LIKES]-(similar_user:User)
+        WHERE similar_user <> u
+        MATCH (similar_user)-[:LIKES]->(rec_movie:Movie)
+        WHERE NOT (u)-[:LIKES]->(rec_movie)
+        RETURN rec_movie.django_id as movie_id, COUNT(*) as score
+        ORDER BY score DESC
+        LIMIT $limit
+        """
+        
+        result = neo4j_conn.run_query(query, {"user_id": user.id, "limit": limit})
+        
+        if result:
+            movie_ids = [record["movie_id"] for record in result]
+            # Get Django Movie objects
+            movies = Movie.objects.filter(id__in=movie_ids)
+            # Order by Neo4j score
+            ordered_movies = []
+            for movie_id in movie_ids:
+                movie = movies.filter(id=movie_id).first()
+                if movie:
+                    ordered_movies.append(movie)
+            return ordered_movies
+        
+    except Exception as e:
+        logger.error(f"Error getting Neo4j recommendations: {e}")
     
-    if recommendation_type == 'content':
-        return engine.get_content_based_recommendations(limit)
-    elif recommendation_type == 'collaborative':
-        return engine.get_collaborative_recommendations(limit)
-    elif recommendation_type == 'trending':
-        return engine.get_trending_recommendations(limit)
-    elif recommendation_type == 'hybrid':
-        return engine.get_hybrid_recommendations(limit)
-    else:
-        return engine.get_hybrid_recommendations(limit)
+    return []
 
 
-def get_popular_movies(limit=20):
-    """Récupère les films populaires pour les utilisateurs non connectés"""
-    return Movie.objects.filter(
-        vote_average__gte=6.0
-    ).order_by('-popularity', '-vote_average')[:limit]
+def get_popular_movies(limit=12):
+    """
+    Get popular movies
+    """
+    return list(Movie.objects.all().order_by('-popularity', '-vote_average')[:limit])
 
 
 def get_movies_by_genre(genre_id, limit=20):
-    """Récupère les films d'un genre spécifique"""
+    """
+    Get movies by genre
+    """
     try:
-        genre = Genre.objects.get(id=genre_id)
-        return Movie.objects.filter(
-            genres=genre
-        ).order_by('-vote_average', '-popularity')[:limit]
-    except Genre.DoesNotExist:
+        return list(Movie.objects.filter(
+            genres__id=genre_id
+        ).order_by('-vote_average', '-popularity')[:limit])
+    except Exception as e:
+        logger.error(f"Error getting movies by genre: {e}")
         return []
 
 
 def record_interaction(user, movie, interaction_type):
-    """Enregistre une interaction utilisateur"""
-    if not user.is_authenticated:
-        return
+    """
+    Record user interaction with a movie
+    Stores in both SQLite and MongoDB
+    """
+    try:
+        # Store in SQLite
+        MovieInteraction.objects.create(
+            user=user,
+            movie=movie,
+            interaction_type=interaction_type
+        )
+        
+        # Store in MongoDB if available
+        sync_interaction_to_mongodb(user, movie, interaction_type)
+        
+        # Store in Neo4j if available
+        sync_interaction_to_neo4j(user, movie, interaction_type)
+        
+    except Exception as e:
+        logger.error(f"Error recording interaction: {e}")
+
+
+def sync_interaction_to_mongodb(user, movie, interaction_type):
+    """
+    Sync interaction to MongoDB
+    """
+    try:
+        from movie_recommender.mongodb_connection import get_interactions_collection
+        
+        collection = get_interactions_collection()
+        if collection is None:
+            return
+        
+        interaction_doc = {
+            'user_id': user.id,
+            'movie_id': movie.id,
+            'interaction_type': interaction_type,
+            'timestamp': user.last_login or user.date_joined
+        }
+        
+        collection.insert_one(interaction_doc)
+        logger.debug(f"Synced interaction to MongoDB: {user.username} {interaction_type} {movie.title}")
+        
+    except Exception as e:
+        logger.error(f"Error syncing interaction to MongoDB: {e}")
+
+
+def sync_interaction_to_neo4j(user, movie, interaction_type):
+    """
+    Sync interaction to Neo4j
+    """
+    try:
+        from movie_recommender.neo4j_connection import get_neo4j_connection
+        
+        neo4j_conn = get_neo4j_connection()
+        if not neo4j_conn.is_connected:
+            return
+        
+        # Create user and movie nodes if they don't exist
+        create_user_query = """
+        MERGE (u:User {django_id: $user_id, username: $username})
+        """
+        
+        create_movie_query = """
+        MERGE (m:Movie {django_id: $movie_id, title: $title})
+        """
+        
+        neo4j_conn.run_query(create_user_query, {
+            "user_id": user.id,
+            "username": user.username
+        })
+        
+        neo4j_conn.run_query(create_movie_query, {
+            "movie_id": movie.id,
+            "title": movie.title
+        })
+        
+        # Create interaction relationship
+        if interaction_type == 'view':
+            relationship_query = """
+            MATCH (u:User {django_id: $user_id})
+            MATCH (m:Movie {django_id: $movie_id})
+            MERGE (u)-[:VIEWED]->(m)
+            """
+        else:
+            relationship_query = """
+            MATCH (u:User {django_id: $user_id})
+            MATCH (m:Movie {django_id: $movie_id})
+            MERGE (u)-[:INTERACTED {type: $interaction_type}]->(m)
+            """
+        
+        neo4j_conn.run_query(relationship_query, {
+            "user_id": user.id,
+            "movie_id": movie.id,
+            "interaction_type": interaction_type
+        })
+        
+        logger.debug(f"Synced interaction to Neo4j: {user.username} {interaction_type} {movie.title}")
+        
+    except Exception as e:
+        logger.error(f"Error syncing interaction to Neo4j: {e}")
+
+
+def sync_user_review_to_neo4j(user, movie, rating, comment):
+    """
+    Sync user review to Neo4j
+    """
+    try:
+        from movie_recommender.neo4j_connection import get_neo4j_connection
+        
+        neo4j_conn = get_neo4j_connection()
+        if not neo4j_conn.is_connected:
+            return
+        
+        # Create user and movie nodes if they don't exist
+        create_user_query = """
+        MERGE (u:User {django_id: $user_id, username: $username})
+        """
+        
+        create_movie_query = """
+        MERGE (m:Movie {django_id: $movie_id, title: $title})
+        """
+        
+        neo4j_conn.run_query(create_user_query, {
+            "user_id": user.id,
+            "username": user.username
+        })
+        
+        neo4j_conn.run_query(create_movie_query, {
+            "movie_id": movie.id,
+            "title": movie.title
+        })
+        
+        # Create review relationship
+        if rating >= 4:
+            # High rating = LIKES relationship
+            review_query = """
+            MATCH (u:User {django_id: $user_id})
+            MATCH (m:Movie {django_id: $movie_id})
+            MERGE (u)-[:LIKES {rating: $rating, comment: $comment}]->(m)
+            """
+        else:
+            # Low rating = DISLIKES relationship
+            review_query = """
+            MATCH (u:User {django_id: $user_id})
+            MATCH (m:Movie {django_id: $movie_id})
+            MERGE (u)-[:RATED {rating: $rating, comment: $comment}]->(m)
+            """
+        
+        neo4j_conn.run_query(review_query, {
+            "user_id": user.id,
+            "movie_id": movie.id,
+            "rating": rating,
+            "comment": comment
+        })
+        
+        logger.debug(f"Synced review to Neo4j: {user.username} rated {movie.title} {rating}/5")
+        
+    except Exception as e:
+        logger.error(f"Error syncing review to Neo4j: {e}")
+
+
+def sync_user_watchlist_to_neo4j(user, movie):
+    """
+    Sync user watchlist to Neo4j
+    """
+    try:
+        from movie_recommender.neo4j_connection import get_neo4j_connection
+        
+        neo4j_conn = get_neo4j_connection()
+        if not neo4j_conn.is_connected:
+            return
+        
+        # Create user and movie nodes if they don't exist
+        create_user_query = """
+        MERGE (u:User {django_id: $user_id, username: $username})
+        """
+        
+        create_movie_query = """
+        MERGE (m:Movie {django_id: $movie_id, title: $title})
+        """
+        
+        neo4j_conn.run_query(create_user_query, {
+            "user_id": user.id,
+            "username": user.username
+        })
+        
+        neo4j_conn.run_query(create_movie_query, {
+            "movie_id": movie.id,
+            "title": movie.title
+        })
+        
+        # Create watchlist relationship
+        watchlist_query = """
+        MATCH (u:User {django_id: $user_id})
+        MATCH (m:Movie {django_id: $movie_id})
+        MERGE (u)-[:WANTS_TO_WATCH]->(m)
+        """
+        
+        neo4j_conn.run_query(watchlist_query, {
+            "user_id": user.id,
+            "movie_id": movie.id
+        })
+        
+        logger.debug(f"Synced watchlist to Neo4j: {user.username} wants to watch {movie.title}")
+        
+    except Exception as e:
+        logger.error(f"Error syncing watchlist to Neo4j: {e}")
+
+
+def get_similar_movies(movie, limit=6):
+    """
+    Get movies similar to the given movie based on genres
+    Enhanced with Neo4j graph-based similarity
+    """
+    try:
+        # Get Neo4j-based similar movies first
+        neo4j_similar = get_neo4j_similar_movies(movie, limit)
+        if neo4j_similar:
+            return neo4j_similar
+        
+        # Fallback to genre-based similarity
+        movie_genres = movie.genres.all()
+        if not movie_genres.exists():
+            return []
+        
+        similar_movies = Movie.objects.filter(
+            genres__in=movie_genres
+        ).exclude(
+            id=movie.id
+        ).distinct().order_by('-vote_average', '-popularity')[:limit]
+        
+        return list(similar_movies)
+    except Exception as e:
+        logger.error(f"Error getting similar movies: {e}")
+        return []
+
+
+def get_neo4j_similar_movies(movie, limit=6):
+    """
+    Get similar movies from Neo4j based on user behavior patterns
+    """
+    try:
+        from movie_recommender.neo4j_connection import get_neo4j_connection
+        
+        neo4j_conn = get_neo4j_connection()
+        if not neo4j_conn.is_connected:
+            return []
+        
+        # Find movies that users who liked this movie also liked
+        query = """
+        MATCH (m:Movie {django_id: $movie_id})<-[:LIKES]-(u:User)-[:LIKES]->(similar:Movie)
+        WHERE similar <> m
+        RETURN similar.django_id as movie_id, COUNT(*) as score
+        ORDER BY score DESC
+        LIMIT $limit
+        """
+        
+        result = neo4j_conn.run_query(query, {"movie_id": movie.id, "limit": limit})
+        
+        if result:
+            movie_ids = [record["movie_id"] for record in result]
+            movies = Movie.objects.filter(id__in=movie_ids)
+            # Order by Neo4j score
+            ordered_movies = []
+            for movie_id in movie_ids:
+                similar_movie = movies.filter(id=movie_id).first()
+                if similar_movie:
+                    ordered_movies.append(similar_movie)
+            return ordered_movies
+        
+    except Exception as e:
+        logger.error(f"Error getting Neo4j similar movies: {e}")
     
-    MovieInteraction.objects.create(
-        user=user,
-        movie=movie,
-        interaction_type=interaction_type
-    )
+    return []
+
+
+def get_trending_movies(limit=20):
+    """
+    Get trending movies based on recent interactions
+    Enhanced with MongoDB analytics
+    """
+    try:
+        # Get MongoDB-based trending movies
+        mongodb_trending = get_mongodb_trending_movies(limit)
+        if mongodb_trending:
+            return mongodb_trending
+        
+        # Fallback to SQLite-based trending
+        trending_movies = Movie.objects.annotate(
+            interaction_count=Count('movieinteraction')
+        ).order_by('-interaction_count', '-popularity')[:limit]
+        
+        return list(trending_movies)
+    except Exception as e:
+        logger.error(f"Error getting trending movies: {e}")
+        return get_popular_movies(limit)
+
+
+def get_mongodb_trending_movies(limit=20):
+    """
+    Get trending movies from MongoDB analytics
+    """
+    try:
+        from movie_recommender.mongodb_connection import get_interactions_collection
+        
+        collection = get_interactions_collection()
+        if collection is None:
+            return []
+        
+        # Aggregate recent interactions
+        pipeline = [
+            {"$group": {
+                "_id": "$movie_id",
+                "interaction_count": {"$sum": 1}
+            }},
+            {"$sort": {"interaction_count": -1}},
+            {"$limit": limit}
+        ]
+        
+        results = list(collection.aggregate(pipeline))
+        
+        if results:
+            movie_ids = [result["_id"] for result in results]
+            movies = Movie.objects.filter(id__in=movie_ids)
+            # Order by MongoDB aggregation results
+            ordered_movies = []
+            for result in results:
+                movie = movies.filter(id=result["_id"]).first()
+                if movie:
+                    ordered_movies.append(movie)
+            return ordered_movies
+        
+    except Exception as e:
+        logger.error(f"Error getting MongoDB trending movies: {e}")
+    
+    return []

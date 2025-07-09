@@ -15,8 +15,8 @@ class TMDbService:
     def __init__(self):
         self.api_key = settings.TMDB_API_KEY
         self.base_url = settings.TMDB_BASE_URL
-        self.image_base_url = settings.TMDB_SETTINGS['image_base_url']
-        self.rate_limit = settings.TMDB_SETTINGS['rate_limit']
+        self.image_base_url = settings.TMDB_SETTINGS.get('image_base_url', 'https://image.tmdb.org/t/p/w500')
+        self.rate_limit = settings.TMDB_SETTINGS.get('rate_limit', 40)
         self.session = requests.Session()
         self.session.params.update({'api_key': self.api_key})
         

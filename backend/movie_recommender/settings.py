@@ -25,13 +25,14 @@ DEBUG = config('DEBUG', default=True, cast=bool)
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1', cast=lambda v: [s.strip() for s in v.split(',')])
 
 # Environment Variables
-TMDB_API_KEY = config('TMDB_API_KEY', default='')
-TMDB_ACCESS_TOKEN = config('TMDB_ACCESS_TOKEN', default='')
-TMDB_BASE_URL = config('TMDB_BASE_URL', default='https://api.themoviedb.org/3')
-MONGODB_URI = config('MONGODB_URI', default='mongodb://localhost:27017/moviedb')
-NEO4J_URI = config('NEO4J_URI', default='bolt://localhost:7687')
-NEO4J_USERNAME = config('NEO4J_USERNAME', default='neo4j')
-NEO4J_PASSWORD = config('NEO4J_PASSWORD', default='password')
+TMDB_API_KEY = config('TMDB_API_KEY')
+TMDB_ACCESS_TOKEN = config('TMDB_ACCESS_TOKEN')
+TMDB_BASE_URL = config('TMDB_BASE_URL')
+MONGODB_URI = config('MONGODB_URI')
+NEO4J_URI = config('NEO4J_URI')
+NEO4J_USERNAME = config('NEO4J_USERNAME')  # Correcting the environment variable reference
+NEO4J_PASSWORD = config('NEO4J_PASSWORD')
+NEO4J_DATABASE = config('NEO4J_DATABASE', default='movierec')
 
 
 # Application definition
@@ -77,7 +78,6 @@ TEMPLATES = [
         "BACKEND": "django.template.backends.django.DjangoTemplates",
         "DIRS": [
             BASE_DIR / "templates",
-            BASE_DIR.parent / "frontend" / "templates",
         ],
         "APP_DIRS": True,
         "OPTIONS": {
@@ -97,15 +97,15 @@ WSGI_APPLICATION = "movie_recommender.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-# MongoDB Configuration with djongo
+# Database configuration - Using SQLite for development
 DATABASES = {
-    'default': {
-        'ENGINE': 'djongo',
-        'NAME': 'movie_recommendation',
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": BASE_DIR / "db.sqlite3",
     }
 }
 
-# MongoDB Configuration
+# MongoDB configuration (pour usage direct avec pymongo si nécessaire)
 MONGODB_SETTINGS = {
     'host': MONGODB_URI,
     'connect': False,
@@ -116,6 +116,7 @@ NEO4J_SETTINGS = {
     'uri': NEO4J_URI,
     'username': NEO4J_USERNAME,
     'password': NEO4J_PASSWORD,
+    'database': NEO4J_DATABASE,
 }
 
 
@@ -158,7 +159,6 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 
 STATICFILES_DIRS = [
     BASE_DIR / "static",
-    BASE_DIR.parent / "frontend" / "static",
 ]
 
 # Media files

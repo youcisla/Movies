@@ -17,7 +17,9 @@ from .recommendation_engine import (
     get_recommendations_for_user, 
     get_popular_movies, 
     get_movies_by_genre,
-    record_interaction
+    record_interaction,
+    sync_user_review_to_neo4j,
+    sync_user_watchlist_to_neo4j
 )
 from .tmdb_service import tmdb_service
 import json
@@ -140,8 +142,8 @@ def recommendations(request):
     
     recommended_movies = get_recommendations_for_user(
         request.user, 
-        recommendation_type=recommendation_type,
-        limit=20
+        limit=20,
+        recommendation_type=recommendation_type
     )
     
     # Pagination
@@ -181,6 +183,9 @@ def add_review(request, movie_id):
                 'comment': comment
             }
         )
+        
+        # Sync to Neo4j
+        sync_user_review_to_neo4j(request.user, movie, rating, comment)
         
         return JsonResponse({
             'success': True,
@@ -243,6 +248,8 @@ def toggle_watchlist(request, movie_id):
         in_watchlist = False
     else:
         in_watchlist = True
+        # Sync to Neo4j when adding to watchlist
+        sync_user_watchlist_to_neo4j(request.user, movie)
     
     return JsonResponse({
         'success': True,
@@ -368,12 +375,10 @@ def api_popular_movies(request):
 @login_required
 def api_recommendations(request):
     """API pour récupérer les recommandations"""
-    recommendation_type = request.GET.get('type', 'hybrid')
     limit = int(request.GET.get('limit', 20))
     
     movies = get_recommendations_for_user(
         request.user,
-        recommendation_type=recommendation_type,
         limit=limit
     )
     

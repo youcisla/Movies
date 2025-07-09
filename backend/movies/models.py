@@ -2,6 +2,11 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator, MaxValueValidator
 from datetime import datetime
+from django.db.models.signals import post_save, post_delete
+from django.dispatch import receiver
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class Genre(models.Model):
@@ -132,3 +137,37 @@ class MovieInteraction(models.Model):
     
     def __str__(self):
         return f'{self.user.username} {self.interaction_type} {self.movie.title}'
+
+
+@receiver(post_save, sender=Movie)
+def movie_post_save(sender, instance, **kwargs):
+    """Sync movie to MongoDB when saved"""
+    try:
+        from .mongodb_sync import sync_movie_to_mongodb
+        sync_movie_to_mongodb(instance)
+    except ImportError:
+        logger.debug("MongoDB sync not available")
+    except Exception as e:
+        logger.error(f"Error syncing movie to MongoDB: {e}")
+
+@receiver(post_save, sender=Review)
+def review_post_save(sender, instance, **kwargs):
+    """Sync review to MongoDB when saved"""
+    try:
+        from .mongodb_sync import sync_review_to_mongodb
+        sync_review_to_mongodb(instance)
+    except ImportError:
+        logger.debug("MongoDB sync not available")
+    except Exception as e:
+        logger.error(f"Error syncing review to MongoDB: {e}")
+
+@receiver(post_save, sender=User)
+def user_post_save(sender, instance, **kwargs):
+    """Sync user to MongoDB when saved"""
+    try:
+        from .mongodb_sync import sync_user_to_mongodb
+        sync_user_to_mongodb(instance)
+    except ImportError:
+        logger.debug("MongoDB sync not available")
+    except Exception as e:
+        logger.error(f"Error syncing user to MongoDB: {e}")
