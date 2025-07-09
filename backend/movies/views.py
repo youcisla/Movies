@@ -20,7 +20,7 @@ from .recommendation_engine import (
     record_interaction,
     sync_user_review_to_neo4j,
     sync_user_watchlist_to_neo4j,
-    remove_user_watchlist_from_neo4j  # Ajouté
+    remove_user_watchlist_from_neo4j
 )
 from .tmdb_service import tmdb_service
 from movie_recommender.neo4j_connection import get_neo4j_connection
@@ -425,6 +425,27 @@ def api_neo4j_recommendations(request):
     for rec in recommendations:
         data.append({
             'id': rec.get('movie_id'),
+            'title': rec.get('title'),
+        })
+    return JsonResponse({'movies': data})
+
+
+@csrf_exempt
+def api_neo4j_movies(request):
+    """API pour lister tous les films depuis Neo4j"""
+    limit = int(request.GET.get('limit', 100))
+    neo4j_conn = get_neo4j_connection()
+    query = """
+    MATCH (m:Movie)
+    RETURN m.id as id, m.title as title
+    ORDER BY m.title ASC
+    LIMIT $limit
+    """
+    results = neo4j_conn.run_query(query, {"limit": limit})
+    data = []
+    for rec in results:
+        data.append({
+            'id': rec.get('id'),
             'title': rec.get('title'),
         })
     return JsonResponse({'movies': data})

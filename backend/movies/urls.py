@@ -33,4 +33,5 @@ urlpatterns = [
     # API
     path('api/popular/', views.api_popular_movies, name='api_popular_movies'),
     path('api/recommendations/', views.api_recommendations, name='api_recommendations'),
+    path('api/neo4j_movies/', views.api_neo4j_movies, name='api_neo4j_movies'),
 ]

@@ -1,6 +1,6 @@
 """
 Recommendation engine for movie recommendations
-Integrates with MongoDB and Neo4j for enhanced recommendations
+Integrates with Neo4j for enhanced recommendations
 """
 from .models import Movie, Review, Genre, MovieInteraction
 from django.contrib.auth.models import User
@@ -12,32 +12,20 @@ logger = logging.getLogger(__name__)
 
 def get_recommendations_for_user(user, limit=10, recommendation_type='hybrid'):
     """
-    Get personalized recommendations for a user
-    Uses both MongoDB and Neo4j when available
+    Obtenir des recommandations personnalisées pour un utilisateur
+    Utilise Neo4j si disponible, sinon fallback SQL
     """
     try:
-        # Fetch recommendations from Neo4j
         from movie_recommender.neo4j_connection import get_neo4j_connection
-        
         neo4j_conn = get_neo4j_connection()
         if neo4j_conn.is_connected:
             neo4j_recommendations = neo4j_conn.get_user_recommendations(user.id, limit)
             if neo4j_recommendations:
                 return neo4j_recommendations
-
-        # Fallback to MongoDB
-        from movie_recommender.mongodb_connection import get_mongodb_connection
-        
-        mongodb_conn = get_mongodb_connection()
-        if mongodb_conn.is_connected:
-            movies_collection = mongodb_conn.get_collection('movies')
-            if movies_collection:
-                return list(movies_collection.find().limit(limit))
-
-        # Fallback to SQLite
+        # Fallback SQL
         return get_popular_movies(limit)
     except Exception as e:
-        logger.error(f"Error getting recommendations: {e}")
+        logger.error(f"Erreur lors de la récupération des recommandations : {e}")
         return get_popular_movies(limit)
 
 
@@ -106,7 +94,7 @@ def get_movies_by_genre(genre_id, limit=20):
 def record_interaction(user, movie, interaction_type):
     """
     Record user interaction with a movie
-    Stores in both SQLite and MongoDB
+    Stores in both SQLite and Neo4j
     """
     try:
         # Store in SQLite
@@ -116,39 +104,11 @@ def record_interaction(user, movie, interaction_type):
             interaction_type=interaction_type
         )
         
-        # Store in MongoDB if available
-        sync_interaction_to_mongodb(user, movie, interaction_type)
-        
         # Store in Neo4j if available
         sync_interaction_to_neo4j(user, movie, interaction_type)
         
     except Exception as e:
         logger.error(f"Error recording interaction: {e}")
-
-
-def sync_interaction_to_mongodb(user, movie, interaction_type):
-    """
-    Sync interaction to MongoDB
-    """
-    try:
-        from movie_recommender.mongodb_connection import get_interactions_collection
-        
-        collection = get_interactions_collection()
-        if collection is None:
-            return
-        
-        interaction_doc = {
-            'user_id': user.id,
-            'movie_id': movie.id,
-            'interaction_type': interaction_type,
-            'timestamp': user.last_login or user.date_joined
-        }
-        
-        collection.insert_one(interaction_doc)
-        logger.debug(f"Synced interaction to MongoDB: {user.username} {interaction_type} {movie.title}")
-        
-    except Exception as e:
-        logger.error(f"Error syncing interaction to MongoDB: {e}")
 
 
 def sync_interaction_to_neo4j(user, movie, interaction_type):

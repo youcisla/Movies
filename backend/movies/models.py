@@ -31,8 +31,8 @@ class Movie(models.Model):
     runtime = models.IntegerField(null=True, blank=True)  # en minutes
     
     # Informations TMDb
-    poster_path = models.CharField(max_length=255, blank=True)
-    backdrop_path = models.CharField(max_length=255, blank=True)
+    poster_path = models.CharField(max_length=255, blank=True, null=True)
+    backdrop_path = models.CharField(max_length=255, blank=True, null=True)
     vote_average = models.FloatField(default=0.0)
     vote_count = models.IntegerField(default=0)
     popularity = models.FloatField(default=0.0)
@@ -141,22 +141,16 @@ class MovieInteraction(models.Model):
 
 @receiver(post_save, sender=Movie)
 def movie_post_save(sender, instance, **kwargs):
-    """Sync movie to MongoDB and Neo4j when saved"""
+    """Sync movie to Neo4j when saved"""
     try:
-        from movie_recommender.mongodb_connection import get_movies_collection
         from movie_recommender.neo4j_connection import get_neo4j_connection
-
-        # Sync to MongoDB
-        movies_collection = get_movies_collection()
-        if movies_collection:
-            movies_collection.replace_one({'_id': instance.id}, instance.to_dict(), upsert=True)
 
         # Sync to Neo4j
         neo4j_conn = get_neo4j_connection()
         if neo4j_conn.is_connected:
             neo4j_conn.create_movie_node(instance.id, instance.title, [genre.name for genre in instance.genres.all()])
     except Exception as e:
-        logger.error(f"Error syncing movie: {e}")
+        logger.error(f"Error syncing movie to Neo4j: {e}")
 
 @receiver(post_save, sender=Review)
 def review_post_save(sender, instance, **kwargs):

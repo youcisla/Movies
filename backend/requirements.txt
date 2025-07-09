@@ -19,9 +19,3 @@ kombu
 redis
 python-dotenv
 neo4j
-pymongo
-dnspython
-certifi
-charset-normalizer
-idna
-urllib3
