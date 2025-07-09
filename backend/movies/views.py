@@ -19,9 +19,11 @@ from .recommendation_engine import (
     get_movies_by_genre,
     record_interaction,
     sync_user_review_to_neo4j,
-    sync_user_watchlist_to_neo4j
+    sync_user_watchlist_to_neo4j,
+    remove_user_watchlist_from_neo4j  # Ajouté
 )
 from .tmdb_service import tmdb_service
+from movie_recommender.neo4j_connection import get_neo4j_connection
 import json
 
 
@@ -139,24 +141,39 @@ class MovieDetailView(DetailView):
 def recommendations(request):
     """Page des recommandations personnalisées"""
     recommendation_type = request.GET.get('type', 'hybrid')
-    
-    recommended_movies = get_recommendations_for_user(
-        request.user, 
-        limit=20,
-        recommendation_type=recommendation_type
-    )
-    
+    use_neo4j = request.GET.get('neo4j', 'false').lower() == 'true'
+
+    if use_neo4j:
+        neo4j_conn = get_neo4j_connection()
+        neo4j_recs = neo4j_conn.get_user_recommendations(request.user.id, limit=20)
+        # On ne récupère que l'id et le titre, donc on crée des objets fictifs pour l'affichage
+        class Neo4jMovie:
+            def __init__(self, id, title):
+                self.id = id
+                self.title = title
+                self.overview = ''
+                self.release_date = None
+                self.vote_average = None
+                self.poster_url = ''
+                self.genres = []
+        recommended_movies = [Neo4jMovie(rec.get('movie_id'), rec.get('title')) for rec in neo4j_recs]
+    else:
+        recommended_movies = get_recommendations_for_user(
+            request.user, 
+            limit=20,
+            recommendation_type=recommendation_type
+        )
     # Pagination
     paginator = Paginator(recommended_movies, 12)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
-    
+
     context = {
         'movies': page_obj,
         'recommendation_type': recommendation_type,
         'page_obj': page_obj,
+        'use_neo4j': use_neo4j,
     }
-    
     return render(request, 'movies/recommendations.html', context)
 
 
@@ -237,20 +254,18 @@ def watchlist(request):
 def toggle_watchlist(request, movie_id):
     """Ajouter ou supprimer un film de la watchlist"""
     movie = get_object_or_404(Movie, id=movie_id)
-    
     watchlist_item, created = Watchlist.objects.get_or_create(
         user=request.user,
         movie=movie
     )
-    
     if not created:
         watchlist_item.delete()
+        remove_user_watchlist_from_neo4j(request.user, movie)  # Sync suppression Neo4j
         in_watchlist = False
     else:
         in_watchlist = True
         # Sync to Neo4j when adding to watchlist
         sync_user_watchlist_to_neo4j(request.user, movie)
-    
     return JsonResponse({
         'success': True,
         'in_watchlist': in_watchlist
@@ -397,6 +412,24 @@ def api_recommendations(request):
     return JsonResponse({'movies': data})
 
 
+@csrf_exempt
+@login_required
+def api_neo4j_recommendations(request):
+    """API pour récupérer les recommandations depuis Neo4j"""
+    limit = int(request.GET.get('limit', 20))
+    user_id = request.user.id
+    neo4j_conn = get_neo4j_connection()
+    recommendations = neo4j_conn.get_user_recommendations(user_id, limit=limit)
+    # Formatage des résultats Neo4j (liste de dicts)
+    data = []
+    for rec in recommendations:
+        data.append({
+            'id': rec.get('movie_id'),
+            'title': rec.get('title'),
+        })
+    return JsonResponse({'movies': data})
+
+
 # Authentification
 def login_view(request):
     """Page de connexion"""
@@ -438,3 +471,48 @@ def register_view(request):
         form = UserCreationForm()
     
     return render(request, 'movies/register.html', {'form': form})
+
+
+def import_movies_to_neo4j():
+    """Importe tous les films SQL dans Neo4j (à lancer depuis la console Django)"""
+    from .models import Movie
+    from movie_recommender.neo4j_connection import get_neo4j_connection
+    neo4j_conn = get_neo4j_connection()
+    count = 0
+    for movie in Movie.objects.all():
+        genres = [g.name for g in movie.genres.all()]
+        neo4j_conn.create_movie_node(movie.id, movie.title, genres)
+        count += 1
+    print(f"Import terminé : {count} films importés dans Neo4j.")
+
+
+def import_all_to_neo4j():
+    """Importe tous les films, utilisateurs, avis et watchlists dans Neo4j (à lancer depuis la console Django)"""
+    from .models import Movie, Review, Watchlist
+    from django.contrib.auth.models import User
+    from movie_recommender.neo4j_connection import get_neo4j_connection
+    neo4j_conn = get_neo4j_connection()
+    # Films
+    movie_count = 0
+    for movie in Movie.objects.all():
+        genres = [g.name for g in movie.genres.all()]
+        neo4j_conn.create_movie_node(movie.id, movie.title, genres)
+        movie_count += 1
+    # Utilisateurs
+    user_count = 0
+    for user in User.objects.all():
+        neo4j_conn.create_user_node(user.id, user.username)
+        user_count += 1
+    # Avis
+    review_count = 0
+    for review in Review.objects.all():
+        neo4j_conn.create_user_rating_relationship(
+            review.user.id, review.movie.id, review.rating, review.comment
+        )
+        review_count += 1
+    # Watchlist
+    watchlist_count = 0
+    for item in Watchlist.objects.all():
+        neo4j_conn.create_user_watchlist_relationship(item.user.id, item.movie.id)
+        watchlist_count += 1
+    print(f"Import terminé : {movie_count} films, {user_count} utilisateurs, {review_count} avis, {watchlist_count} watchlists importés dans Neo4j.")

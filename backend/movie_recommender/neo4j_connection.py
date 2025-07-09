@@ -52,7 +52,8 @@ class Neo4jConnection:
             return []
             
         try:
-            with self.driver.session(database="movierec") as session:
+            # Utiliser la base par défaut (utile pour Neo4j Aura Free)
+            with self.driver.session() as session:
                 result = session.run(query, parameters or {})
                 return [record for record in result]
         except Exception as e:
