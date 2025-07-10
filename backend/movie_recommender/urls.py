@@ -9,6 +9,7 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from django.http import JsonResponse
+from django.shortcuts import render
 
 def health_check(request):
     """Health check endpoint"""
@@ -17,6 +18,9 @@ def health_check(request):
         'service': 'Django Movie Recommendation System',
         'version': '1.0.0'
     })
+
+def homepage(request):
+    return render(request, 'base.html')
 
 urlpatterns = [
     # Admin
@@ -35,6 +39,9 @@ urlpatterns = [
     
     # Dashboard
     path('dashboard/', include('dashboard_queries.urls')),
+    
+    # Homepage
+    path('', homepage, name='homepage'),
 ]
 
 # Static and media files
