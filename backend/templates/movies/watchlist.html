@@ -6,29 +6,29 @@
 <div class="container mt-4">
     <div class="row">
         <div class="col-12">
-            <h1 class="mb-4">
-                <i class="fas fa-bookmark me-2"></i>Ma Liste de Films à Voir
+            <h1 class="mb-4 text-3xl font-bold flex items-center gap-2">
+                <i class="fas fa-bookmark text-indigo-500"></i>Ma Liste de Films à Voir
             </h1>
             
             {% if watchlist_items %}
                 <div class="row">
                     {% for item in watchlist_items %}
                     <div class="col-lg-2 col-md-3 col-sm-4 col-6 mb-4">
-                        <div class="movie-card">
-                            <div class="card border-0 shadow-sm h-100">
+                        <div class="movie-card transition-transform duration-200 hover:scale-105">
+                            <div class="card border-0 shadow-lg h-100 bg-gradient-to-br from-white to-gray-100">
                                 <div class="position-relative">
                                     {% if item.movie.poster_url %}
-                                    <img src="{{ item.movie.poster_url }}" class="card-img-top movie-poster" alt="{{ item.movie.title }}">
+                                    <img src="{{ item.movie.poster_url }}" class="card-img-top movie-poster rounded-t-lg" alt="{{ item.movie.title }}">
                                     {% else %}
-                                    <div class="card-img-top bg-light d-flex align-items-center justify-content-center movie-poster">
-                                        <i class="fas fa-film text-muted" style="font-size: 3rem;"></i>
+                                    <div class="card-img-top bg-gradient-to-br from-gray-200 to-gray-400 d-flex align-items-center justify-content-center movie-poster rounded-t-lg">
+                                        <i class="fas fa-film text-gray-400" style="font-size: 3rem;"></i>
                                     </div>
                                     {% endif %}
                                     
                                     <!-- Rating badge -->
                                     {% if item.movie.vote_average %}
                                     <div class="position-absolute top-0 end-0 m-2">
-                                        <span class="badge bg-warning text-dark">
+                                        <span class="badge bg-yellow-400 text-dark shadow">
                                             <i class="fas fa-star"></i> {{ item.movie.vote_average|floatformat:1 }}
                                         </span>
                                     </div>
@@ -36,17 +36,17 @@
                                     
                                     <!-- Remove from watchlist button -->
                                     <div class="position-absolute top-0 start-0 m-2">
-                                        <button class="btn btn-sm btn-danger watchlist-btn" 
+                                        <button class="btn btn-sm btn-danger watchlist-btn bg-white/80 hover:bg-red-200 transition" 
                                                 data-movie-id="{{ item.movie.id }}"
                                                 title="Retirer de ma liste">
-                                            <i class="fas fa-times"></i>
+                                            <i class="fas fa-times text-red-600"></i>
                                         </button>
                                     </div>
                                 </div>
                                 
                                 <div class="card-body">
-                                    <h6 class="card-title">
-                                        <a href="{% url 'movies:movie_detail' item.movie.pk %}" class="text-decoration-none text-dark">
+                                    <h6 class="card-title font-bold text-lg">
+                                        <a href="{% url 'movies:movie_detail' item.movie.pk %}" class="text-decoration-none text-gray-900 hover:text-indigo-700 transition">
                                             {{ item.movie.title|truncatechars:30 }}
                                         </a>
                                     </h6>
@@ -64,7 +64,7 @@
                                 </div>
                                 
                                 <div class="card-footer bg-transparent border-0">
-                                    <a href="{% url 'movies:movie_detail' item.movie.pk %}" class="btn btn-sm btn-primary">
+                                    <a href="{% url 'movies:movie_detail' item.movie.pk %}" class="btn btn-sm btn-primary shadow">
                                         <i class="fas fa-eye me-1"></i>Voir détails
                                     </a>
                                 </div>
@@ -109,10 +109,10 @@
                 
             {% else %}
                 <div class="text-center py-5">
-                    <i class="fas fa-bookmark text-muted mb-3" style="font-size: 4rem;"></i>
-                    <h3>Votre liste est vide</h3>
+                    <i class="fas fa-bookmark text-indigo-200 mb-3" style="font-size: 4rem;"></i>
+                    <h3 class="font-bold">Votre liste est vide</h3>
                     <p class="text-muted">Ajoutez des films à votre liste pour les retrouver facilement ici.</p>
-                    <a href="{% url 'movies:movie_list' %}" class="btn btn-primary">
+                    <a href="{% url 'movies:movie_list' %}" class="btn btn-primary shadow">
                         <i class="fas fa-search me-2"></i>Découvrir des films
                     </a>
                 </div>

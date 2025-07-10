@@ -4,36 +4,29 @@
 {% block title %}Accueil - MovieRec{% endblock %}
 
 {% block content %}
-<div class="container">
-    <!-- Hero Section -->
-    <section class="hero-section bg-primary text-white rounded-3 p-5 mb-5">
-        <div class="row align-items-center">
-            <div class="col-lg-6">
-                <h1 class="display-4 fw-bold">Découvrez vos prochains films préférés</h1>
-                <p class="lead">Système de recommandation personnalisé basé sur vos goûts et préférences</p>
-                {% if not user.is_authenticated %}
-                <div class="mt-4">
-                    <a href="{% url 'movies:register' %}" class="btn btn-light btn-lg me-3">
-                        <i class="fas fa-user-plus me-2"></i>Commencer
-                    </a>
-                    <a href="{% url 'movies:movie_list' %}" class="btn btn-outline-light btn-lg">
-                        <i class="fas fa-play me-2"></i>Explorer
-                    </a>
-                </div>
-                {% endif %}
+<div class="container-fluid p-0 min-vh-100">
+    <!-- Hero Banner glassmorphism -->
+    <section class="hero-section position-relative d-flex align-items-center justify-content-center" style="height: 60vh; background: linear-gradient(120deg, #f8fafc 60%, #e0e7ff 100%);">
+        <div class="glass position-absolute top-50 start-0 translate-middle-y ps-5 py-5 px-5" style="z-index:2; max-width: 600px;">
+            <h1 class="display-2 fw-bold mb-3 text-primary" style="text-shadow: 0 2px 16px #fff;">Découvrez vos prochains <span class="text-gradient" style="background: linear-gradient(90deg,#7f5af0,#2ec4b6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">films préférés</span></h1>
+            <p class="lead mb-4 text-secondary">Un système de recommandation élégant, moderne et personnalisé.</p>
+            {% if not user.is_authenticated %}
+            <div class="d-flex gap-3">
+                <a href="{% url 'movies:register' %}" class="btn btn-gradient btn-lg shadow-lg px-4 btn-pill">
+                    <i class="fas fa-user-plus me-2"></i>Commencer
+                </a>
+                <a href="{% url 'movies:movie_list' %}" class="btn btn-outline-primary btn-lg px-4 btn-pill">
+                    <i class="fas fa-play me-2"></i>Explorer
+                </a>
             </div>
-            <div class="col-lg-6">
-                <div class="text-center">
-                    <i class="fas fa-film" style="font-size: 8rem; opacity: 0.3;"></i>
-                </div>
-            </div>
+            {% endif %}
         </div>
     </section>
 
     <!-- Statistiques utilisateur -->
     {% if user.is_authenticated %}
     <section class="user-stats mb-5">
-        <div class="row">
+        <div class="row" style="margin-top: 30px;">
             <div class="col-md-4">
                 <div class="card border-0 shadow-sm">
                     <div class="card-body text-center">
@@ -65,19 +58,16 @@
     </section>
     {% endif %}
 
-    <!-- Films recommandés (utilisateur connecté) -->
+    <!-- Carrousel horizontal Netflix-like pour les recommandations -->
     {% if user.is_authenticated and recommended_movies %}
-    <section class="recommendations-section mb-5">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2><i class="fas fa-star text-warning me-2"></i>Recommandé pour vous</h2>
-            <a href="{% url 'movies:recommendations' %}" class="btn btn-outline-primary">
-                Voir tout <i class="fas fa-arrow-right ms-1"></i>
-            </a>
+    <section class="recommendations-section mb-5 px-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2 class="text-primary"><i class="fas fa-star text-gradient me-2" style="background: linear-gradient(90deg,#7f5af0,#2ec4b6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;"></i>Recommandé pour vous</h2>
+            <a href="{% url 'movies:recommendations' %}" class="btn btn-gradient btn-pill">Voir tout <i class="fas fa-arrow-right ms-1"></i></a>
         </div>
-        
-        <div class="row">
+        <div class="overflow-auto flex-nowrap d-flex gap-4 pb-2" style="scrollbar-width: thin;">
             {% for movie in recommended_movies %}
-            <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 mb-4">
+            <div class="glass p-2" style="min-width: 220px; max-width: 220px;">
                 {% include 'movies/movie_card.html' %}
             </div>
             {% endfor %}
@@ -85,39 +75,31 @@
     </section>
     {% endif %}
 
-    <!-- Films populaires -->
-    <section class="popular-section mb-5">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2><i class="fas fa-fire text-danger me-2"></i>Films populaires</h2>
-            <a href="{% url 'movies:movie_list' %}" class="btn btn-outline-primary">
-                Voir tout <i class="fas fa-arrow-right ms-1"></i>
-            </a>
+    <!-- Carrousel horizontal Netflix-like pour les films populaires -->
+    <section class="popular-section mb-5 px-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2 class="text-primary"><i class="fas fa-fire text-gradient me-2" style="background: linear-gradient(90deg,#ff5e62,#2ec4b6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;"></i>Films populaires</h2>
+            <a href="{% url 'movies:movie_list' %}" class="btn btn-gradient btn-pill">Voir tout <i class="fas fa-arrow-right ms-1"></i></a>
         </div>
-        
-        <div class="row">
+        <div class="overflow-auto flex-nowrap d-flex gap-4 pb-2" style="scrollbar-width: thin;">
             {% for movie in popular_movies %}
-            <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 mb-4">
+            <div class="glass p-2" style="min-width: 220px; max-width: 220px;">
                 {% include 'movies/movie_card.html' %}
             </div>
             {% endfor %}
         </div>
     </section>
 
-    <!-- Genres -->
-    <section class="genres-section mb-5">
-        <h2 class="mb-4"><i class="fas fa-tags text-info me-2"></i>Explorer par genre</h2>
-        
-        <div class="row">
+    <!-- Genres en carrousel horizontal -->
+    <section class="genres-section mb-5 px-4">
+        <h2 class="mb-3 text-primary"><i class="fas fa-tags text-gradient me-2" style="background: linear-gradient(90deg,#7f5af0,#2ec4b6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;"></i>Explorer par genre</h2>
+        <div class="overflow-auto flex-nowrap d-flex gap-4 pb-2" style="scrollbar-width: thin;">
             {% for genre in genres %}
-            <div class="col-lg-3 col-md-4 col-sm-6 mb-3">
-                <a href="{% url 'movies:movies_by_genre' genre.id %}" class="text-decoration-none">
-                    <div class="card border-0 shadow-sm h-100 genre-card">
-                        <div class="card-body text-center">
-                            <h5 class="card-title text-primary">{{ genre.name }}</h5>
-                        </div>
-                    </div>
-                </a>
-            </div>
+            <a href="{% url 'movies:movies_by_genre' genre.id %}" class="text-decoration-none" style="min-width: 180px; max-width: 180px;">
+                <div class="glass h-100 genre-card text-center py-4 hover:bg-primary hover:text-white transition">
+                    <h5 class="card-title text-primary">{{ genre.name }}</h5>
+                </div>
+            </a>
             {% endfor %}
         </div>
     </section>

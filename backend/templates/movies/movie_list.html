@@ -8,23 +8,21 @@
     <!-- Header avec filtres -->
     <div class="row mb-4">
         <div class="col-12">
-            <h1><i class="fas fa-film me-2"></i>Films</h1>
-            
-            <!-- Filtres -->
-            <div class="card border-0 shadow-sm">
+            <h1 class="text-3xl font-bold mb-3"><i class="fas fa-film me-2 text-indigo-500"></i>Films</h1>
+            <!-- Filtres modernisés -->
+            <div class="card border-0 shadow-lg bg-gradient-to-r from-gray-100 to-gray-200">
                 <div class="card-body">
-                    <form method="get" class="row g-3">
+                    <form method="get" class="row g-3 items-end">
                         <!-- Recherche -->
                         <div class="col-md-4">
-                            <label class="form-label">Recherche</label>
-                            <input type="text" class="form-control" name="search" 
+                            <label class="form-label font-semibold">Recherche</label>
+                            <input type="text" class="form-control focus:ring-2 focus:ring-indigo-400" name="search" 
                                    value="{{ current_search }}" placeholder="Titre du film...">
                         </div>
-                        
                         <!-- Genre -->
                         <div class="col-md-3">
-                            <label class="form-label">Genre</label>
-                            <select class="form-select" name="genre">
+                            <label class="form-label font-semibold">Genre</label>
+                            <select class="form-select focus:ring-2 focus:ring-indigo-400" name="genre">
                                 <option value="">Tous les genres</option>
                                 {% for genre in genres %}
                                 <option value="{{ genre.id }}" {% if current_genre == genre.id|stringformat:"s" %}selected{% endif %}>
@@ -33,18 +31,16 @@
                                 {% endfor %}
                             </select>
                         </div>
-                        
                         <!-- Année -->
                         <div class="col-md-2">
-                            <label class="form-label">Année</label>
-                            <input type="number" class="form-control" name="year" 
+                            <label class="form-label font-semibold">Année</label>
+                            <input type="number" class="form-control focus:ring-2 focus:ring-indigo-400" name="year" 
                                    value="{{ current_year }}" min="1900" max="2024">
                         </div>
-                        
                         <!-- Tri -->
                         <div class="col-md-2">
-                            <label class="form-label">Trier par</label>
-                            <select class="form-select" name="sort">
+                            <label class="form-label font-semibold">Trier par</label>
+                            <select class="form-select focus:ring-2 focus:ring-indigo-400" name="sort">
                                 <option value="-popularity" {% if current_sort == "-popularity" %}selected{% endif %}>
                                     Popularité
                                 </option>
@@ -59,12 +55,11 @@
                                 </option>
                             </select>
                         </div>
-                        
                         <!-- Boutons -->
                         <div class="col-md-1">
                             <label class="form-label">&nbsp;</label>
                             <div class="d-flex gap-2">
-                                <button type="submit" class="btn btn-primary">
+                                <button type="submit" class="btn btn-primary shadow">
                                     <i class="fas fa-search"></i>
                                 </button>
                                 <a href="{% url 'movies:movie_list' %}" class="btn btn-outline-secondary">

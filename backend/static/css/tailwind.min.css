@@ -1,0 +1,2 @@
+/* Tailwind CSS CDN import for development. For production, use npm or a build tool. */
+@import url('https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css');

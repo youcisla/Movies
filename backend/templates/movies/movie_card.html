@@ -1,33 +1,20 @@
 <!-- Carte de film réutilisable -->
-{% comment %}
-  Handle both Django model objects and Neo4j dictionary data
-  Django models have: .pk, .id, .vote_average, etc.
-  Neo4j data has: movie_id, rating, etc.
-{% endcomment %}
-
-<div class="movie-card">
-    <div class="card border-0 shadow-sm h-100">
+<div class="movie-card transition-transform duration-200 hover:scale-105">
+    <div class="card border-0 shadow-lg h-100 bg-gradient-to-br from-white to-gray-100">
         <div class="position-relative">
             {% if movie.poster_url %}
-            <img src="{{ movie.poster_url }}" class="card-img-top movie-poster" alt="{{ movie.title }}">
-            {% elif movie.poster_path %}
-            <img src="https://image.tmdb.org/t/p/w500{{ movie.poster_path }}" class="card-img-top movie-poster" alt="{{ movie.title }}">
+            <img src="{{ movie.poster_url }}" class="card-img-top movie-poster rounded-t-lg" alt="{{ movie.title }}">
             {% else %}
-            <div class="card-img-top bg-light d-flex align-items-center justify-content-center movie-poster">
-                <i class="fas fa-film text-muted" style="font-size: 3rem;"></i>
+            <div class="card-img-top bg-gradient-to-br from-gray-200 to-gray-400 d-flex align-items-center justify-content-center movie-poster rounded-t-lg">
+                <i class="fas fa-film text-gray-400" style="font-size: 3rem;"></i>
             </div>
             {% endif %}
             
             <!-- Rating badge -->
             {% if movie.vote_average or movie.rating %}
             <div class="position-absolute top-0 end-0 m-2">
-                <span class="badge bg-warning text-dark">
-                    <i class="fas fa-star"></i> 
-                    {% if movie.vote_average %}
-                        {{ movie.vote_average|floatformat:1 }}
-                    {% else %}
-                        {{ movie.rating|floatformat:1 }}
-                    {% endif %}
+                <span class="badge bg-yellow-400 text-dark shadow">
+                    <i class="fas fa-star"></i> {{ movie.vote_average|floatformat:1 }}
                 </span>
             </div>
             {% endif %}
@@ -35,18 +22,18 @@
             <!-- Watchlist button -->
             {% if user.is_authenticated %}
             <div class="position-absolute top-0 start-0 m-2">
-                <button class="btn btn-sm btn-outline-light watchlist-btn" 
-                        data-movie-id="{% if movie.pk %}{{ movie.id }}{% else %}{{ movie.movie_id }}{% endif %}"
+                <button class="btn btn-sm btn-outline-light watchlist-btn bg-white/80 hover:bg-yellow-200 transition" 
+                        data-movie-id="{{ movie.id }}"
                         title="Ajouter à ma liste">
-                    <i class="fas fa-bookmark"></i>
+                    <i class="fas fa-bookmark text-indigo-600"></i>
                 </button>
             </div>
             {% endif %}
         </div>
         
         <div class="card-body">
-            <h6 class="card-title">
-                <a href="{% url 'movies:movie_detail' movie.pk|default:movie.movie_id %}" class="text-decoration-none text-dark">
+            <h6 class="card-title font-bold text-lg">
+                <a href="{% url 'movies:movie_detail' movie.pk %}" class="text-decoration-none text-gray-900 hover:text-indigo-700 transition">
                     {{ movie.title|truncatechars:30 }}
                 </a>
             </h6>
@@ -75,16 +62,15 @@
         
         <div class="card-footer bg-transparent border-0">
             <div class="d-flex justify-content-between align-items-center">
-                <a href="{% url 'movies:movie_detail' movie.pk|default:movie.movie_id %}" class="btn btn-sm btn-primary">
+                <a href="{% url 'movies:movie_detail' movie.pk %}" class="btn btn-sm btn-primary shadow">
                     <i class="fas fa-eye me-1"></i>Voir détails
                 </a>
-                
                 {% if user.is_authenticated %}
                 <div class="btn-group" role="group">
-                    <button class="btn btn-sm btn-outline-secondary rating-btn" 
-                            data-movie-id="{% if movie.pk %}{{ movie.id }}{% else %}{{ movie.movie_id }}{% endif %}"
+                    <button class="btn btn-sm btn-outline-secondary rating-btn hover:bg-yellow-100 transition" 
+                            data-movie-id="{{ movie.id }}"
                             title="Noter ce film">
-                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star text-yellow-500"></i>
                     </button>
                 </div>
                 {% endif %}
@@ -97,22 +83,6 @@
 .movie-poster {
     height: 300px;
     object-fit: cover;
-}
-
-.movie-card {
-    transition: transform 0.2s ease;
-}
-
-.movie-card:hover {
-    transform: translateY(-5px);
-}
-
-.watchlist-btn {
-    backdrop-filter: blur(10px);
-}
-
-.watchlist-btn:hover {
-    background-color: rgba(255, 255, 255, 0.9);
-    color: #000;
+    border-radius: 0.5rem 0.5rem 0 0;
 }
 </style>
