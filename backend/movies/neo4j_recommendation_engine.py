@@ -321,7 +321,11 @@ class Neo4jRecommendationEngine:
              count(CASE WHEN genre = 'Action' THEN 1 END) as action_count,
              count(genre) as total_genre_count,
              size(ratings) as total_ratings,
-             avg([rating IN ratings | rating.rating]) as avg_rating
+             CASE 
+                WHEN size(ratings) > 0 THEN 
+                    reduce(sum = 0.0, rating IN ratings | sum + rating.rating) / size(ratings)
+                ELSE 0.0 
+             END as avg_rating
         
         RETURN {
             total_ratings: total_ratings,

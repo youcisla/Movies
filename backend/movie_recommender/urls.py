@@ -9,6 +9,7 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from django.http import JsonResponse
+from django.shortcuts import redirect
 
 def health_check(request):
     """Health check endpoint"""
@@ -18,7 +19,14 @@ def health_check(request):
         'version': '1.0.0'
     })
 
+def homepage_redirect(request):
+    """Redirect root URL to movies home"""
+    return redirect('movies:home')
+
 urlpatterns = [
+    # Homepage
+    path('', homepage_redirect, name='homepage'),
+    
     # Admin
     path('admin/', admin.site.urls),
     
@@ -32,6 +40,9 @@ urlpatterns = [
     path('api/analytics/', include('analytics.urls')),
     path('api/dashboard-queries/', include('dashboard_queries.urls')),
     path('api/user-profile/', include('user_profile.urls')),
+    
+    # Dashboard
+    path('dashboard/', include('dashboard_queries.urls')),
 ]
 
 # Static and media files
@@ -44,7 +55,7 @@ if settings.DEBUG:
         try:
             import debug_toolbar
             urlpatterns = [
-                # path('__debug__/', include(debug_toolbar.urls)),
+                path('__debug__/', include(debug_toolbar.urls)),
             ] + urlpatterns
         except ImportError:
             pass
