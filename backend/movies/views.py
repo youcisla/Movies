@@ -141,7 +141,7 @@ class MovieListView(ListView):
     paginate_by = 20
     
     def get_queryset(self):
-        queryset = Movie.objects.all()
+        queryset = Movie.objects.select_related().prefetch_related('genres')
         
         # Filtrage par recherche
         search_query = self.request.GET.get('search')

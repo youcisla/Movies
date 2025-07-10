@@ -1,3 +1,4 @@
+{% load movie_tags %}
 <!-- Enhanced Movie Card with Modern UI/UX -->
 <div class="movie-card h-100">
     <div class="card border-0 shadow-hover h-100 overflow-hidden">
@@ -67,19 +68,13 @@
             </h6>
             
             <!-- Genres -->
-            {% if movie.genres.all or movie.genres %}
             <div class="genre-tags mb-2">
-                {% if movie.genres.all %}
-                    {% for genre in movie.genres.all|slice:":2" %}
-                        <span class="genre-tag">{{ genre.name }}</span>
-                    {% endfor %}
-                {% elif movie.genres %}
-                    {% for genre in movie.genres|slice:":2" %}
-                        <span class="genre-tag">{{ genre }}</span>
-                    {% endfor %}
-                {% endif %}
+                {% for genre in movie|get_genres|slice:":2" %}
+                    <span class="genre-tag">
+                        {% if genre.name %}{{ genre.name }}{% else %}{{ genre }}{% endif %}
+                    </span>
+                {% endfor %}
             </div>
-            {% endif %}
             
             <!-- Overview -->
             {% if movie.overview %}

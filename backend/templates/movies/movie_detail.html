@@ -22,12 +22,12 @@
     <div class="row">
         <!-- Poster -->
         <div class="col-md-4 mb-4">
-            <div class="card border-0 shadow-lg bg-gradient-to-br from-white to-gray-100">
+            <div class="movie-poster-card">
                 {% if movie.poster_url %}
-                <img src="{{ movie.poster_url }}" class="card-img-top rounded-t-lg" alt="{{ movie.title }}" style="height: 600px; object-fit: cover;">
+                <img src="{{ movie.poster_url }}" class="movie-poster-img" alt="{{ movie.title }}">
                 {% else %}
-                <div class="card-img-top bg-gradient-to-br from-gray-200 to-gray-400 d-flex align-items-center justify-content-center rounded-t-lg" style="height: 600px;">
-                    <i class="fas fa-film text-gray-400" style="font-size: 5rem;"></i>
+                <div class="movie-poster-placeholder">
+                    <i class="fas fa-film"></i>
                 </div>
                 {% endif %}
             </div>
@@ -35,31 +35,31 @@
 
         <!-- Informations principales -->
         <div class="col-md-8">
-            <div class="card border-0 shadow-lg bg-gradient-to-br from-white to-gray-100">
+            <div class="movie-info-card">
                 <div class="card-body">
-                    <h1 class="card-title font-bold text-3xl mb-2">{{ movie.title }}</h1>
+                    <h1 class="movie-title">{{ movie.title }}</h1>
                     
                     {% if movie.original_title != movie.title %}
-                    <p class="text-muted">Titre original : {{ movie.original_title }}</p>
+                    <p class="movie-original-title">Titre original : {{ movie.original_title }}</p>
                     {% endif %}
 
                     <!-- Métadonnées -->
-                    <div class="row mb-3">
+                    <div class="movie-metadata row mb-3">
                         <div class="col-md-6">
-                            <p><strong>Date de sortie :</strong> 
+                            <p class="metadata-item"><strong>Date de sortie :</strong> 
                                 {% if movie.release_date %}
                                     {{ movie.release_date|date:"d F Y" }}
                                 {% else %}
-                                    Non spécifiée
+                                    <span class="text-muted">Non spécifiée</span>
                                 {% endif %}
                             </p>
                         </div>
                         <div class="col-md-6">
-                            <p><strong>Durée :</strong> 
+                            <p class="metadata-item"><strong>Durée :</strong> 
                                 {% if movie.runtime %}
                                     {{ movie.runtime }} minutes
                                 {% else %}
-                                    Non spécifiée
+                                    <span class="text-muted">Non spécifiée</span>
                                 {% endif %}
                             </p>
                         </div>
@@ -67,51 +67,51 @@
 
                     <!-- Genres -->
                     <div class="mb-3">
-                        <strong>Genres :</strong>
+                        <strong class="genre-label">Genres :</strong>
                         {% for genre in movie.genres.all %}
-                        <a href="{% url 'movies:movies_by_genre' genre.id %}" class="badge bg-secondary text-decoration-none me-1">
+                        <a href="{% url 'movies:movies_by_genre' genre.id %}" class="genre-badge">
                             {{ genre.name }}
                         </a>
                         {% endfor %}
                     </div>
 
                     <!-- Évaluations -->
-                    <div class="row mb-3">
+                    <div class="movie-ratings row mb-3">
                         <div class="col-md-6">
-                            <p><strong>Note TMDb :</strong> 
-                                <span class="badge bg-warning text-dark">
+                            <p class="rating-item"><strong>Note TMDb :</strong> 
+                                <span class="rating-badge rating-tmdb">
                                     <i class="fas fa-star"></i> {{ movie.vote_average|floatformat:1 }}/10
                                 </span>
-                                <small class="text-muted">({{ movie.vote_count }} votes)</small>
+                                <small class="vote-count">({{ movie.vote_count }} votes)</small>
                             </p>
                         </div>
                         <div class="col-md-6">
-                            <p><strong>Note utilisateurs :</strong> 
-                                <span class="badge bg-info">
+                            <p class="rating-item"><strong>Note utilisateurs :</strong> 
+                                <span class="rating-badge rating-users">
                                     <i class="fas fa-users"></i> {{ average_rating|floatformat:1 }}/5
                                 </span>
-                                <small class="text-muted">({{ reviews_count }} avis)</small>
+                                <small class="vote-count">({{ reviews_count }} avis)</small>
                             </p>
                         </div>
                     </div>
 
                     <!-- Synopsis -->
                     {% if movie.overview %}
-                    <div class="mb-4">
-                        <h5>Synopsis</h5>
-                        <p class="text-justify">{{ movie.overview }}</p>
+                    <div class="movie-synopsis mb-4">
+                        <h5 class="synopsis-title">Synopsis</h5>
+                        <p class="synopsis-text">{{ movie.overview }}</p>
                     </div>
                     {% endif %}
 
                     <!-- Actions utilisateur -->
                     {% if user.is_authenticated %}
-                    <div class="d-flex gap-2 mb-3">
-                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#reviewModal">
+                    <div class="movie-actions d-flex gap-2 mb-3">
+                        <button class="btn btn-primary action-btn" data-bs-toggle="modal" data-bs-target="#reviewModal">
                             <i class="fas fa-star me-1"></i>
                             {% if user_review %}Modifier mon avis{% else %}Donner mon avis{% endif %}
                         </button>
                         
-                        <button class="btn btn-outline-secondary watchlist-btn" data-movie-id="{{ movie.id }}">
+                        <button class="btn btn-outline-secondary action-btn watchlist-btn" data-movie-id="{{ movie.id }}">
                             <i class="fas fa-bookmark me-1"></i>
                             {% if in_watchlist %}Retirer de ma liste{% else %}Ajouter à ma liste{% endif %}
                         </button>
@@ -174,7 +174,7 @@
                                 <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#reviewModal">
                                     <i class="fas fa-edit"></i> Modifier
                                 </button>
-                                <button class="btn btn-sm btn-outline-danger" onclick="deleteReview({{ review.id }})">
+                                <button class="btn btn-sm btn-outline-danger" onclick="deleteReview('{{ review.id }}')">
                                     <i class="fas fa-trash"></i> Supprimer
                                 </button>
                             </div>

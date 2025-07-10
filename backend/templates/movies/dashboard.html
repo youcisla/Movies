@@ -5,14 +5,17 @@
 
 {% block content %}
 <div class="container">
-    <!-- Enhanced Header -->
+    <!-- Enhanced Header with Better Contrast -->
     <div class="row mb-5">
         <div class="col-12">
-            <div class="dashboard-header text-center">
-                <h1 class="display-4 fw-bold text-gradient-animated mb-3">
-                    <i class="fas fa-chart-line me-3"></i>Dashboard Intelligent
+            <div class="dashboard-header text-center py-5">
+                <h1 class="dashboard-title" style="color: #0f172a !important; font-weight: 900 !important; font-size: 3rem !important;">
+                    <i class="fas fa-chart-line me-3" style="color: #2563eb;"></i>
+                    Dashboard Intelligent
                 </h1>
-                <p class="lead text-muted">Analysez vos préférences et découvrez comment notre système fonctionne</p>
+                <p class="dashboard-subtitle" style="color: #334155 !important; font-weight: 600 !important; font-size: 1.25rem !important;">
+                    Analysez vos préférences et découvrez comment notre système fonctionne
+                </p>
             </div>
         </div>
     </div>
@@ -244,22 +247,24 @@
 </div>
 
 <style>
-/* Enhanced Dashboard Styles */
-.dashboard-header {
-    padding: 3rem 0;
-    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
-    border-radius: 2rem;
-    margin-bottom: 2rem;
-}
+/* Enhanced Dashboard Styles for Better Contrast and Readability */
 
+/* Cards and Stats */
 .stats-card {
-    background: white;
-    border-radius: 1.5rem;
-    padding: 2rem;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    background: #ffffff;
+    border: 2px solid #e2e8f0;
+    border-radius: 1rem;
+    padding: 1.5rem;
     transition: all 0.3s ease;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     position: relative;
     overflow: hidden;
+}
+
+.stats-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    border-color: #2563eb;
 }
 
 .stats-card::before {
@@ -269,12 +274,21 @@
     left: 0;
     right: 0;
     height: 4px;
-    background: var(--primary-gradient);
+    background: linear-gradient(90deg, #2563eb, #7c3aed);
 }
 
-.stats-card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+.stats-content h3 {
+    color: #0f172a !important;
+    font-weight: 900 !important;
+    font-size: 2.5rem !important;
+    margin-bottom: 0.5rem;
+}
+
+.stats-content p {
+    color: #334155 !important;
+    font-weight: 600 !important;
+    font-size: 1rem !important;
+    margin: 0;
 }
 
 .stats-icon {
@@ -289,187 +303,219 @@
     color: white;
 }
 
-.stats-number {
-    font-size: 2.5rem;
-    font-weight: 800;
-    margin-bottom: 0.5rem;
-    color: var(--text-primary);
+.stats-icon.bg-primary {
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
 }
 
-.stats-label {
-    color: var(--text-muted);
-    margin: 0;
-    font-weight: 500;
+.stats-icon.bg-success {
+    background: linear-gradient(135deg, #059669, #047857);
 }
 
-.analytics-card, .insights-card, .engine-card, .activity-card {
-    background: white;
-    border-radius: 1.5rem;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+.stats-icon.bg-warning {
+    background: linear-gradient(135deg, #ea580c, #dc2626);
+}
+
+.stats-icon.bg-info {
+    background: linear-gradient(135deg, #0891b2, #0e7490);
+}
+
+/* Analytics Cards */
+.analytics-card {
+    background: #ffffff;
+    border: 2px solid #e2e8f0;
+    border-radius: 1rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     overflow: hidden;
     transition: all 0.3s ease;
 }
 
-.analytics-card:hover, .insights-card:hover, .engine-card:hover, .activity-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+.analytics-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
 }
 
-.card-header {
-    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
-    border-bottom: none;
-    padding: 1.5rem 2rem;
-}
-
-.card-header h4 {
-    margin: 0;
-    color: var(--text-primary);
-    font-weight: 700;
-}
-
-.card-body {
-    padding: 2rem;
-}
-
-.insight-item {
-    display: flex;
-    align-items: center;
-    padding: 1rem;
-    background: rgba(102, 126, 234, 0.05);
-    border-radius: 1rem;
-    transition: all 0.3s ease;
-}
-
-.insight-item:hover {
-    background: rgba(102, 126, 234, 0.1);
-    transform: translateX(5px);
-}
-
-.insight-icon {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    background: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-right: 1rem;
-    font-size: 1.2rem;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-}
-
-.insight-content h6 {
-    margin: 0 0 0.25rem 0;
-    font-weight: 600;
-    color: var(--text-primary);
-}
-
-.insight-content p {
-    color: var(--text-secondary);
-    font-weight: 500;
-}
-
-.engine-step {
+.analytics-card .card-header {
+    background: #f8fafc;
+    border-bottom: 2px solid #e2e8f0;
     padding: 1.5rem;
-    background: rgba(255, 255, 255, 0.8);
+}
+
+.analytics-card .card-header h4 {
+    color: #0f172a !important;
+    font-weight: 800 !important;
+    font-size: 1.5rem !important;
+    margin-bottom: 0.5rem;
+}
+
+.analytics-card .card-header p {
+    color: #64748b !important;
+    font-weight: 500 !important;
+    margin: 0;
+}
+
+.analytics-card .card-body {
+    padding: 1.5rem;
+}
+
+/* Insights Cards */
+.insights-card {
+    background: #ffffff;
+    border: 2px solid #e2e8f0;
     border-radius: 1rem;
-    border: 2px solid rgba(102, 126, 234, 0.1);
-    transition: all 0.3s ease;
-    height: 100%;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
 }
 
-.engine-step:hover {
-    border-color: var(--primary-color);
-    transform: translateY(-5px);
-    box-shadow: 0 10px 25px rgba(102, 126, 234, 0.2);
-}
-
-.step-icon {
-    width: 70px;
-    height: 70px;
-    background: var(--primary-gradient);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 1rem;
-    font-size: 1.8rem;
+.insights-card .card-header {
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
     color: white;
-    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+    padding: 1.5rem;
 }
 
-.activity-timeline {
+.insights-card .card-header h4 {
+    color: white !important;
+    font-weight: 800 !important;
+    font-size: 1.5rem !important;
+    margin-bottom: 0.5rem;
+}
+
+.insights-card .card-header p {
+    color: rgba(255, 255, 255, 0.8) !important;
+    font-weight: 500 !important;
+    margin: 0;
+}
+
+.insights-card .card-body {
+    padding: 1.5rem;
+}
+
+/* Timeline styles */
+.timeline-item {
+    background: #f8fafc;
+    border: 2px solid #e2e8f0;
+    border-radius: 0.75rem;
+    padding: 1.25rem;
+    margin-bottom: 1rem;
     position: relative;
-    padding-left: 2rem;
+    transition: all 0.3s ease;
 }
 
-.activity-timeline::before {
+.timeline-item:hover {
+    background: #ffffff;
+    border-color: #2563eb;
+    transform: translateX(4px);
+}
+
+.timeline-item::before {
     content: '';
     position: absolute;
-    left: 0.75rem;
-    top: 0;
-    bottom: 0;
-    width: 2px;
-    background: linear-gradient(to bottom, var(--primary-color), var(--secondary-color));
-}
-
-.timeline-item {
-    position: relative;
-    margin-bottom: 2rem;
-    padding-left: 2rem;
-}
-
-.timeline-marker {
-    position: absolute;
-    left: -2rem;
-    top: 0.25rem;
-    width: 1.5rem;
-    height: 1.5rem;
+    left: -8px;
+    top: 1.5rem;
+    width: 4px;
+    height: 4px;
+    background: #2563eb;
     border-radius: 50%;
-    border: 3px solid white;
-    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
 }
 
-.timeline-content {
-    background: rgba(248, 250, 252, 0.8);
-    padding: 1rem 1.5rem;
-    border-radius: 1rem;
-    border-left: 4px solid var(--primary-color);
+.timeline-item h6 {
+    color: #0f172a !important;
+    font-weight: 700 !important;
+    font-size: 1.125rem !important;
+    margin-bottom: 0.5rem;
 }
 
-.timeline-content h6 {
-    margin: 0 0 0.5rem 0;
-    font-weight: 600;
-    color: var(--text-primary);
+.timeline-item p {
+    color: #475569 !important;
+    font-weight: 500 !important;
+    margin: 0;
 }
 
-/* Chart Containers */
-#viewingTrendsChart, #genreDistributionChart {
-    max-height: 300px;
+.timeline-item small {
+    color: #64748b !important;
+    font-weight: 500 !important;
 }
 
-/* Responsive Design */
+/* List group enhancements */
+.list-group-item {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    color: #334155 !important;
+    font-weight: 500 !important;
+    padding: 1rem;
+    transition: all 0.3s ease;
+}
+
+.list-group-item:hover {
+    background: #f8fafc;
+    border-color: #2563eb;
+    transform: translateX(2px);
+}
+
+/* Enhanced titles and headings */
+.dashboard-title {
+    background: linear-gradient(135deg, #0f172a, #334155);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.dashboard-subtitle {
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* Responsive improvements */
 @media (max-width: 768px) {
-    .stats-card {
-        text-align: center;
-        margin-bottom: 1rem;
+    .dashboard-title {
+        font-size: 2rem !important;
     }
     
-    .stats-number {
-        font-size: 2rem;
+    .dashboard-subtitle {
+        font-size: 1rem !important;
     }
     
-    .dashboard-header {
-        padding: 2rem 1rem;
+    .stats-content h3 {
+        font-size: 2rem !important;
     }
     
-    .card-body {
-        padding: 1.5rem;
+    .stats-icon {
+        width: 48px;
+        height: 48px;
+        font-size: 1.25rem;
     }
     
-    .engine-step {
-        margin-bottom: 1rem;
+    .analytics-card .card-header h4 {
+        font-size: 1.25rem !important;
     }
+}
+
+/* Animation for better UX */
+.stats-card,
+.analytics-card,
+.insights-card {
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeInUp 0.6s ease forwards;
+}
+
+.stats-card:nth-child(1) { animation-delay: 0.1s; }
+.stats-card:nth-child(2) { animation-delay: 0.2s; }
+.stats-card:nth-child(3) { animation-delay: 0.3s; }
+.stats-card:nth-child(4) { animation-delay: 0.4s; }
+
+@keyframes fadeInUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Better focus states for accessibility */
+.stats-card:focus-within,
+.analytics-card:focus-within,
+.insights-card:focus-within {
+    outline: 2px solid #2563eb;
+    outline-offset: 2px;
 }
 </style>
 {% endblock %}

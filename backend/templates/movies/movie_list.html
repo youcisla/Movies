@@ -5,14 +5,17 @@
 
 {% block content %}
 <div class="container">
-    <!-- Enhanced Header -->
+    <!-- Enhanced Header with Better Contrast -->
     <div class="row mb-4">
         <div class="col-12">
-            <div class="page-header">
-                <h1 class="display-4 fw-bold text-gradient mb-3">
-                    <i class="fas fa-film me-3"></i>Découvrez des films
+            <div class="movies-page-header text-center py-4">
+                <h1 class="movies-title" style="color: #0f172a !important; font-weight: 900 !important; font-size: 3rem !important;">
+                    <i class="fas fa-film me-3" style="color: #2563eb;"></i>
+                    Découvrez des films
                 </h1>
-                <p class="lead text-muted">Explorez notre collection de films avec des filtres avancés</p>
+                <p class="movies-subtitle" style="color: #334155 !important; font-weight: 600 !important; font-size: 1.25rem !important;">
+                    Explorez notre collection de films avec des filtres avancés
+                </p>
             </div>
         </div>
     </div>
@@ -20,20 +23,22 @@
     <!-- Advanced Filters -->
     <div class="row mb-4">
         <div class="col-12">
-            <div class="filters-card">
-                <div class="card-header">
-                    <h5><i class="fas fa-filter me-2"></i>Filtres avancés</h5>
-                    <button type="button" class="btn btn-outline-secondary btn-sm" onclick="resetFilters()">
+            <div class="movies-filters-card">
+                <div class="filters-header">
+                    <h5 class="filters-title">
+                        <i class="fas fa-filter me-2"></i>Filtres avancés
+                    </h5>
+                    <button type="button" class="btn btn-outline-secondary btn-sm reset-filters-btn" onclick="resetFilters()">
                         <i class="fas fa-undo me-1"></i>Réinitialiser
                     </button>
                 </div>
-                <div class="card-body">
-                    <form method="get" class="filter-form" id="filterForm">
+                <div class="filters-body">
+                    <form method="get" class="movies-filter-form" id="filterForm">
                         <div class="row g-3">
                             <!-- Search -->
                             <div class="col-lg-3 col-md-6">
-                                <label class="form-label fw-semibold">Recherche</label>
-                                <div class="search-input-group">
+                                <label class="filter-label">Recherche</label>
+                                <div class="search-input-wrapper">
                                     <i class="fas fa-search search-icon"></i>
                                     <input type="text" 
                                            class="form-control search-input" 
@@ -46,8 +51,8 @@
                             
                             <!-- Genre -->
                             <div class="col-lg-2 col-md-6">
-                                <label class="form-label fw-semibold">Genre</label>
-                                <select class="form-select" name="genre">
+                                <label class="filter-label">Genre</label>
+                                <select class="form-select filter-select" name="genre">
                                     <option value="">Tous les genres</option>
                                     {% for genre in genres %}
                                     <option value="{{ genre.id }}" {% if current_genre == genre.id|stringformat:"s" %}selected{% endif %}>
@@ -59,8 +64,8 @@
                             
                             <!-- Year Range -->
                             <div class="col-lg-2 col-md-6">
-                                <label class="form-label fw-semibold">Année</label>
-                                <select class="form-select" name="year">
+                                <label class="filter-label">Année</label>
+                                <select class="form-select filter-select" name="year">
                                     <option value="">Toutes les années</option>
                                     <option value="2020-2024" {% if current_year == "2020-2024" %}selected{% endif %}>2020-2024</option>
                                     <option value="2010-2019" {% if current_year == "2010-2019" %}selected{% endif %}>2010-2019</option>
@@ -72,8 +77,8 @@
                             
                             <!-- Rating -->
                             <div class="col-lg-2 col-md-6">
-                                <label class="form-label fw-semibold">Note minimale</label>
-                                <select class="form-select" name="rating">
+                                <label class="filter-label">Note minimale</label>
+                                <select class="form-select filter-select" name="rating">
                                     <option value="">Toutes les notes</option>
                                     <option value="8" {% if current_rating == "8" %}selected{% endif %}>8+ ⭐</option>
                                     <option value="7" {% if current_rating == "7" %}selected{% endif %}>7+ ⭐</option>
@@ -84,8 +89,8 @@
                             
                             <!-- Sort -->
                             <div class="col-lg-2 col-md-6">
-                                <label class="form-label fw-semibold">Trier par</label>
-                                <select class="form-select" name="sort">
+                                <label class="filter-label">Trier par</label>
+                                <select class="form-select filter-select" name="sort">
                                     <option value="-popularity" {% if current_sort == "-popularity" %}selected{% endif %}>
                                         Popularité
                                     </option>
@@ -106,8 +111,8 @@
                             
                             <!-- Submit Button -->
                             <div class="col-lg-1 col-md-12">
-                                <label class="form-label d-none d-lg-block">&nbsp;</label>
-                                <button type="submit" class="btn btn-primary w-100">
+                                <label class="filter-label d-none d-lg-block">&nbsp;</label>
+                                <button type="submit" class="btn btn-primary filter-submit-btn w-100">
                                     <i class="fas fa-search"></i>
                                 </button>
                             </div>
@@ -121,31 +126,31 @@
     <!-- Results Summary -->
     <div class="row mb-4">
         <div class="col-12">
-            <div class="results-summary">
+            <div class="movies-results-summary">
                 <div class="d-flex justify-content-between align-items-center">
                     <div class="results-info">
-                        <h5 class="mb-1">
+                        <h5 class="results-count-title">
                             <span class="results-count">{{ movies|length }}</span> 
                             film{{ movies|length|pluralize }} trouvé{{ movies|length|pluralize }}
                         </h5>
                         {% if current_search or current_genre or current_year or current_rating %}
                         <div class="active-filters">
                             {% if current_search %}
-                                <span class="filter-tag">
+                                <span class="active-filter-tag">
                                     <i class="fas fa-search me-1"></i>{{ current_search }}
-                                    <button type="button" class="btn-close-filter" onclick="removeFilter('search')">×</button>
+                                    <button type="button" class="filter-remove-btn" onclick="removeFilter('search')">×</button>
                                 </span>
                             {% endif %}
                             {% if current_genre %}
-                                <span class="filter-tag">
+                                <span class="active-filter-tag">
                                     <i class="fas fa-tag me-1"></i>{{ genres|first.name }}
-                                    <button type="button" class="btn-close-filter" onclick="removeFilter('genre')">×</button>
+                                    <button type="button" class="filter-remove-btn" onclick="removeFilter('genre')">×</button>
                                 </span>
                             {% endif %}
                             {% if current_year %}
-                                <span class="filter-tag">
+                                <span class="active-filter-tag">
                                     <i class="fas fa-calendar me-1"></i>{{ current_year }}
-                                    <button type="button" class="btn-close-filter" onclick="removeFilter('year')">×</button>
+                                    <button type="button" class="filter-remove-btn" onclick="removeFilter('year')">×</button>
                                 </span>
                             {% endif %}
                             {% if current_rating %}
@@ -261,38 +266,794 @@
 </div>
 
 <style>
-/* Enhanced Movie List Styles */
-.page-header {
+/* Enhanced Movie List Styles with Superior Readability and Contrast */
+
+/* Page Header */
+.movies-page-header {
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    border-radius: 1.5rem;
+    padding: 3rem 2rem;
     text-align: center;
-    padding: 3rem 0;
-    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
-    border-radius: 2rem;
+    border: 2px solid #e2e8f0;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     margin-bottom: 2rem;
 }
 
-.filters-card {
-    background: white;
-    border-radius: 1.5rem;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
+.movies-title {
+    background: linear-gradient(135deg, #0f172a, #334155);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: 900 !important;
+    font-size: 3rem !important;
+    margin-bottom: 1rem;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.filters-card .card-header {
-    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
-    border-bottom: none;
+.movies-subtitle {
+    color: #334155 !important;
+    font-weight: 600 !important;
+    font-size: 1.25rem !important;
+    margin: 0;
+    opacity: 0.9;
+}
+
+/* Enhanced Filters Card */
+.movies-filters-card {
+    background: #ffffff;
+    border-radius: 1.5rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    border: 2px solid #e2e8f0;
+    overflow: hidden;
+    margin-bottom: 2rem;
+    transition: all 0.3s ease;
+}
+
+.movies-filters-card:hover {
+    border-color: #2563eb;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+.filters-header {
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
     padding: 1.5rem 2rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    border-bottom: 2px solid #e2e8f0;
 }
 
-.filters-card .card-header h5 {
+.filters-title {
+    color: #0f172a !important;
+    font-weight: 800 !important;
     margin: 0;
-    font-weight: 700;
-    color: var(--text-primary);
+    font-size: 1.25rem;
 }
 
-.filter-form {
+.reset-filters-btn {
+    border: 2px solid #e2e8f0;
+    color: #334155 !important;
+    font-weight: 600;
+    background: #ffffff;
+    border-radius: 0.5rem;
+    padding: 0.5rem 1rem;
+    transition: all 0.3s ease;
+}
+
+.reset-filters-btn:hover {
+    border-color: #2563eb;
+    color: #2563eb !important;
+    background: #f0f9ff;
+    transform: translateY(-2px);
+}
+
+.filters-body {
+    padding: 2rem;
+    background: #ffffff;
+}
+
+.filter-label {
+    color: #0f172a !important;
+    font-weight: 700 !important;
+    margin-bottom: 0.75rem;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.search-input-wrapper {
+    position: relative;
+}
+
+.search-input-wrapper .search-icon {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #64748b;
+    z-index: 3;
+    transition: all 0.3s ease;
+}
+
+.search-input {
+    padding-left: 3rem;
+    border: 2px solid #e2e8f0;
+    border-radius: 0.75rem;
+    background: #ffffff;
+    color: #0f172a !important;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.search-input:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    background: #ffffff;
+    color: #0f172a !important;
+}
+
+.search-input:focus + .search-icon {
+    color: #2563eb;
+}
+
+.form-select {
+    border: 2px solid #e2e8f0;
+    border-radius: 0.75rem;
+    background: #ffffff;
+    color: #0f172a !important;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.form-select:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    color: #0f172a !important;
+}
+
+.filter-submit-btn {
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    border: none;
+    border-radius: 0.75rem;
+    font-weight: 700;
+    padding: 0.75rem;
+    color: white;
+    transition: all 0.3s ease;
+}
+
+.filter-submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3);
+}
+
+/* Enhanced Results Summary */
+.movies-results-summary {
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    border-radius: 1rem;
+    padding: 1.5rem 2rem;
+    margin-bottom: 2rem;
+    border: 2px solid #e2e8f0;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.results-count-title {
+    color: #0f172a !important;
+    font-weight: 800 !important;
+    margin-bottom: 0.75rem;
+    font-size: 1.25rem;
+}
+
+.results-count {
+    color: #2563eb !important;
+    font-weight: 900 !important;
+    font-size: 1.5em;
+}
+
+.active-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+}
+
+.active-filter-tag {
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    color: white !important;
+    padding: 0.5rem 1rem;
+    border-radius: 50px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    box-shadow: 0 2px 4px rgba(37, 99, 235, 0.3);
+}
+
+.filter-remove-btn {
+    background: rgba(255, 255, 255, 0.3);
+    border: none;
+    color: white;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.875rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.filter-remove-btn:hover {
+    background: rgba(255, 255, 255, 0.5);
+    transform: scale(1.1);
+}
+
+.view-options .btn-group .btn {
+    border: 2px solid #e2e8f0;
+    color: #334155 !important;
+    background: #ffffff;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.view-options .btn-group .btn.active {
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    border-color: #2563eb;
+    color: white !important;
+    box-shadow: 0 2px 4px rgba(37, 99, 235, 0.3);
+}
+
+.view-options .btn-group .btn:hover {
+    border-color: #2563eb;
+    color: #2563eb !important;
+    background: #f0f9ff;
+    transform: translateY(-2px);
+}
+
+/* Movie Grid Items */
+.movie-grid-item {
+    transition: all 0.3s ease;
+}
+
+.movie-grid-item:hover {
+    transform: translateY(-4px);
+}
+
+/* No Results State */
+.no-results {
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    border-radius: 1.5rem;
+    border: 2px dashed #cbd5e0;
+    padding: 4rem 2rem;
+    text-align: center;
+    margin: 2rem 0;
+}
+
+.no-results-icon {
+    font-size: 4rem;
+    color: #94a3b8;
+    margin-bottom: 1.5rem;
+}
+
+.no-results h4 {
+    color: #0f172a !important;
+    font-weight: 800 !important;
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+}
+
+.no-results p {
+    color: #64748b !important;
+    font-size: 1.125rem;
+    margin-bottom: 2rem;
+    font-weight: 500;
+}
+
+.no-results .btn {
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    border: none;
+    color: white;
+    font-weight: 700;
+    padding: 0.75rem 2rem;
+    border-radius: 50px;
+    transition: all 0.3s ease;
+}
+
+.no-results .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3);
+}
+
+/* Enhanced Pagination */
+.pagination {
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 3rem;
+}
+
+.pagination .page-link {
+    border: 2px solid #e2e8f0;
+    border-radius: 0.75rem;
+    padding: 0.75rem 1rem;
+    color: #0f172a !important;
+    background: #ffffff;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.pagination .page-link:hover {
+    border-color: #2563eb;
+    color: #2563eb !important;
+    background: #f0f9ff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(37, 99, 235, 0.2);
+}
+
+.pagination .page-item.active .page-link {
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    border-color: #2563eb;
+    color: white !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(37, 99, 235, 0.3);
+}
+
+/* Strong Text Color Overrides for Maximum Readability */
+h1, h2, h3, h4, h5, h6 {
+    color: #0f172a !important;
+    font-weight: 800 !important;
+}
+
+p, .lead {
+    color: #334155 !important;
+    font-weight: 500 !important;
+}
+
+.text-muted {
+    color: #64748b !important;
+    font-weight: 500 !important;
+}
+
+.text-secondary {
+    color: #334155 !important;
+    font-weight: 500 !important;
+}
+
+.text-primary {
+    color: #2563eb !important;
+    font-weight: 600 !important;
+}
+
+small {
+    color: #64748b !important;
+    font-weight: 500 !important;
+}
+
+/* Enhanced Responsive Design */
+@media (max-width: 768px) {
+    .movies-title {
+        font-size: 2rem !important;
+    }
+    
+    .movies-subtitle {
+        font-size: 1rem !important;
+    }
+    
+    .filters-header {
+        padding: 1rem 1.5rem;
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+    }
+    
+    .filters-body {
+        padding: 1.5rem;
+    }
+    
+    .movies-results-summary {
+        padding: 1rem 1.5rem;
+    }
+    
+    .results-info {
+        margin-bottom: 1rem;
+    }
+    
+    .active-filters {
+        margin-top: 0.5rem;
+    }
+    
+    .view-options {
+        text-align: center;
+    }
+}
+
+@media (max-width: 576px) {
+    .movies-page-header {
+        padding: 2rem 1rem;
+    }
+    
+    .movies-title {
+        font-size: 1.75rem !important;
+    }
+    
+    .filter-submit-btn {
+        margin-top: 1rem;
+    }
+    
+    .pagination .page-link {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.875rem;
+    }
+}
+
+/* Focus States for Accessibility */
+.search-input:focus,
+.form-select:focus,
+.filter-submit-btn:focus,
+.reset-filters-btn:focus,
+.pagination .page-link:focus {
+    outline: 2px solid #2563eb;
+    outline-offset: 2px;
+}
+
+/* Animation for better UX */
+.movies-filters-card,
+.movies-results-summary,
+.movie-grid-item {
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeInUp 0.6s ease forwards;
+}
+
+.movies-filters-card { animation-delay: 0.1s; }
+.movies-results-summary { animation-delay: 0.2s; }
+.movie-grid-item:nth-child(1) { animation-delay: 0.3s; }
+.movie-grid-item:nth-child(2) { animation-delay: 0.4s; }
+.movie-grid-item:nth-child(3) { animation-delay: 0.5s; }
+.movie-grid-item:nth-child(4) { animation-delay: 0.6s; }
+
+@keyframes fadeInUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+</style>
+}
+
+.movies-filters-card:hover {
+    border-color: #2563eb;
+}
+
+.filters-header {
+    background: #f8fafc;
+    padding: 1.5rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.filters-title {
+    color: #0f172a !important;
+    font-weight: 700;
+    margin: 0;
+    font-size: 1.25rem;
+}
+
+.reset-filters-btn {
+    border-color: #e2e8f0;
+    color: #64748b !important;
+    font-weight: 500;
+}
+
+.reset-filters-btn:hover {
+    border-color: #2563eb;
+    color: #2563eb !important;
+    background: #f0f9ff;
+}
+
+.filters-body {
+    padding: 2rem;
+    background: #ffffff;
+}
+
+.filter-label {
+    color: #334155 !important;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.search-input-wrapper {
+    position: relative;
+}
+
+.search-input-wrapper .search-icon {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #64748b;
+    z-index: 3;
+}
+
+.search-input {
+    padding-left: 3rem;
+    border: 2px solid #e2e8f0;
+    border-radius: 0.75rem;
+    background: #ffffff;
+    color: #0f172a !important;
+    font-weight: 500;
+}
+
+.search-input:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    background: #ffffff;
+}
+
+.form-select {
+    border: 2px solid #e2e8f0;
+    border-radius: 0.75rem;
+    background: #ffffff;
+    color: #0f172a !important;
+    font-weight: 500;
+}
+
+.form-select:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.filter-submit-btn {
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    border: none;
+    border-radius: 0.75rem;
+    font-weight: 600;
+    padding: 0.75rem;
+}
+
+.filter-submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+/* Enhanced Results Summary */
+.movies-results-summary {
+    background: #f8fafc;
+    border-radius: 1rem;
+    padding: 1.5rem 2rem;
+    margin-bottom: 2rem;
+    border: 2px solid #e2e8f0;
+}
+
+.results-count-title {
+    color: #0f172a !important;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+}
+
+.results-count {
+    color: #2563eb !important;
+    font-weight: 800;
+    font-size: 1.25em;
+}
+
+.active-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+}
+
+.active-filter-tag {
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    color: white !important;
+    padding: 0.5rem 1rem;
+    border-radius: 50px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.filter-remove-btn {
+    background: rgba(255, 255, 255, 0.3);
+    border: none;
+    color: white;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.875rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.filter-remove-btn:hover {
+    background: rgba(255, 255, 255, 0.5);
+}
+
+.view-options .btn-group .btn {
+    border-color: #e2e8f0;
+    color: #64748b !important;
+}
+
+.view-options .btn-group .btn.active {
+    background: #2563eb;
+    border-color: #2563eb;
+    color: white !important;
+}
+
+.view-options .btn-group .btn:hover {
+    border-color: #2563eb;
+    color: #2563eb !important;
+    background: #f0f9ff;
+}
+
+/* Movie Grid Items */
+.movie-grid-item {
+    transition: all 0.3s ease;
+}
+
+.movie-grid-item:hover {
+    transform: translateY(-4px);
+}
+
+/* No Results State */
+.no-results {
+    background: #f8fafc;
+    border-radius: 1.5rem;
+    border: 2px dashed #e2e8f0;
+    padding: 4rem 2rem;
+    text-align: center;
+}
+
+.no-results-icon {
+    font-size: 4rem;
+    color: #94a3b8;
+    margin-bottom: 1.5rem;
+}
+
+.no-results h4 {
+    color: #0f172a !important;
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
+.no-results p {
+    color: #64748b !important;
+    font-size: 1.125rem;
+    margin-bottom: 2rem;
+}
+
+.no-results .btn {
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    border: none;
+    color: white;
+    font-weight: 600;
+    padding: 0.75rem 2rem;
+    border-radius: 50px;
+}
+
+/* Enhanced Pagination */
+.pagination {
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 3rem;
+}
+
+.pagination .page-link {
+    border: 2px solid #e2e8f0;
+    border-radius: 0.75rem;
+    padding: 0.75rem 1rem;
+    color: #334155 !important;
+    background: #ffffff;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.pagination .page-link:hover {
+    border-color: #2563eb;
+    color: #2563eb !important;
+    background: #f0f9ff;
+    transform: translateY(-2px);
+}
+
+.pagination .page-item.active .page-link {
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    border-color: #2563eb;
+    color: white !important;
+    transform: translateY(-2px);
+}
+
+/* Text Color Overrides */
+h1, h2, h3, h4, h5, h6 {
+    color: #0f172a !important;
+}
+
+p, .lead {
+    color: #334155 !important;
+}
+
+.text-muted {
+    color: #64748b !important;
+}
+
+.text-secondary {
+    color: #334155 !important;
+}
+
+.text-primary {
+    color: #2563eb !important;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .movies-title {
+        font-size: 2rem;
+    }
+    
+    .movies-subtitle {
+        font-size: 1rem;
+    }
+    
+    .filters-header {
+        padding: 1rem 1.5rem;
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+    }
+    
+    .filters-body {
+        padding: 1.5rem;
+    }
+    
+    .movies-results-summary {
+        padding: 1rem 1.5rem;
+    }
+    
+    .results-info {
+        margin-bottom: 1rem;
+    }
+    
+    .active-filters {
+        margin-top: 0.5rem;
+    }
+    
+    .view-options {
+        text-align: center;
+    }
+}
+
+@media (max-width: 576px) {
+    .movies-page-header {
+        padding: 2rem 1rem;
+    }
+    
+    .movies-title {
+        font-size: 1.75rem;
+    }
+    
+    .filter-submit-btn {
+        margin-top: 1rem;
+    }
+    
+    .pagination .page-link {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.875rem;
+    }
+}
+</style>
     padding: 0;
 }
 
