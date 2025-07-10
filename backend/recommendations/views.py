@@ -6,7 +6,9 @@ from movies.models import Movie
 from movies.recommendation_engine import (
     get_recommendations_for_user,
     get_similar_movies,
-    get_trending_movies
+    get_trending_movies,
+    get_smart_recommendations_based_on_last_viewed,
+    get_action_movie_recommendations
 )
 
 
@@ -85,5 +87,45 @@ def trending_movies(request):
                 'popularity': movie.popularity,
             }
             for movie in trending
+        ]
+    })
+
+
+@login_required
+def smart_recommendations(request):
+    """Get smart recommendations based on user's last viewed movie"""
+    recommendations = get_smart_recommendations_based_on_last_viewed(request.user, limit=20)
+    
+    return JsonResponse({
+        'smart_recommendations': [
+            {
+                'id': movie.id,
+                'title': movie.title,
+                'poster_url': movie.poster_url,
+                'vote_average': movie.vote_average,
+                'release_year': movie.release_year,
+                'genres': [genre.name for genre in movie.genres.all()],
+            }
+            for movie in recommendations
+        ]
+    })
+
+
+@login_required 
+def action_recommendations(request):
+    """Get specialized action movie recommendations"""
+    recommendations = get_action_movie_recommendations(request.user, limit=20)
+    
+    return JsonResponse({
+        'action_recommendations': [
+            {
+                'id': movie.id,
+                'title': movie.title,
+                'poster_url': movie.poster_url,
+                'vote_average': movie.vote_average,
+                'release_year': movie.release_year,
+                'genres': [genre.name for genre in movie.genres.all()],
+            }
+            for movie in recommendations
         ]
     })

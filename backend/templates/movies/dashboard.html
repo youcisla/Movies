@@ -1,0 +1,181 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Dashboard Recommandations - MovieRec{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1><i class="fas fa-chart-line text-primary me-2"></i>Dashboard Intelligent</h1>
+            <p class="text-muted">Analysez vos préférences et découvrez comment notre système fonctionne</p>
+        </div>
+    </div>
+
+    <!-- New Recommendations and Statistics Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card border-0 shadow-lg">
+                <div class="card-header bg-gradient-primary text-white">
+                    <h4><i class="fas fa-database me-2"></i>Recommandations et Statistiques</h4>
+                    <p class="mb-0">Découvrez les données et recommandations intelligentes</p>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-lg-6 mb-4">
+                            <h5>Top Films d'Action</h5>
+                            <ul id="actionMovies" class="list-group">
+                                <!-- Dynamically populated -->
+                            </ul>
+                        </div>
+                        <div class="col-lg-6 mb-4">
+                            <h5>Meilleurs Films de Science-fiction</h5>
+                            <ul id="sciFiMovies" class="list-group">
+                                <!-- Dynamically populated -->
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-6 mb-4">
+                            <h5>Films Populaires Cette Semaine</h5>
+                            <ul id="popularMovies" class="list-group">
+                                <!-- Dynamically populated -->
+                            </ul>
+                        </div>
+                        <div class="col-lg-6 mb-4">
+                            <h5>Tendances des Comédies</h5>
+                            <ul id="comedyTrends" class="list-group">
+                                <!-- Dynamically populated -->
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-12 mb-4">
+                            <h5>Réalisateurs les Plus Recommandés</h5>
+                            <ul id="topDirectors" class="list-group">
+                                <!-- Dynamically populated -->
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<style>
+.bg-gradient-primary {
+    background: linear-gradient(45deg, #007bff, #0056b3);
+}
+
+.text-purple {
+    color: #6f42c1 !important;
+}
+
+.border-4 {
+    border-width: 4px !important;
+}
+
+.card {
+    transition: transform 0.2s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+}
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize dashboard
+    loadAnalytics();
+    loadDashboardData();
+});
+
+function loadAnalytics() {
+    // Load analytics data
+    fetch('/movies/api/analytics/')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                document.getElementById('popularGenres').textContent = data.popular_genres || 'N/A';
+                document.getElementById('seasonalTrends').textContent = data.seasonal_trends || 'N/A';
+                document.getElementById('sentimentAnalysis').textContent = data.sentiment_analysis || 'N/A';
+                document.getElementById('userEngagement').textContent = data.user_engagement || 'N/A';
+            }
+        })
+        .catch(error => {
+            console.error('Analytics loading error:', error);
+            // Set default values
+            document.getElementById('popularGenres').textContent = 'Action, Drama';
+            document.getElementById('seasonalTrends').textContent = 'Summer Hits';
+            document.getElementById('sentimentAnalysis').textContent = 'Positive';
+            document.getElementById('userEngagement').textContent = 'High';
+        });
+}
+
+function loadDashboardData() {
+    // Load dashboard data for new sections
+    fetch('/movies/api/dashboard-queries/')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                populateList('actionMovies', data.action_movies);
+                populateList('sciFiMovies', data.sci_fi_movies);
+                populateList('popularMovies', data.popular_this_week);
+                populateList('comedyTrends', data.comedy_trends);
+                populateList('topDirectors', data.top_directors);
+            } else {
+                console.error('Dashboard data error:', data.error);
+                displayErrorMessage();
+            }
+        })
+        .catch(error => {
+            console.error('Error loading dashboard data:', error);
+            displayErrorMessage();
+        });
+}
+
+function populateList(elementId, items) {
+    const list = document.getElementById(elementId);
+    list.innerHTML = '';
+    if (items.length === 0) {
+        const li = document.createElement('li');
+        li.className = 'list-group-item';
+        li.textContent = 'No data available';
+        list.appendChild(li);
+    } else {
+        items.forEach(item => {
+            const li = document.createElement('li');
+            li.className = 'list-group-item';
+            li.textContent = item.title || item.director || 'N/A';
+            list.appendChild(li);
+        });
+    }
+}
+
+function displayErrorMessage() {
+    const sections = ['actionMovies', 'sciFiMovies', 'popularMovies', 'comedyTrends', 'topDirectors'];
+    sections.forEach(section => {
+        const list = document.getElementById(section);
+        list.innerHTML = '';
+        const li = document.createElement('li');
+        li.className = 'list-group-item text-danger';
+        li.textContent = 'Error loading data';
+        list.appendChild(li);
+    });
+}
+</script>
+{% endblock %}

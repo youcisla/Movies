@@ -44,6 +44,8 @@
                 <i class="fas fa-info-circle me-2 text-indigo-600"></i>
                 {% if recommendation_type == 'hybrid' %}
                     <strong>Recommandations mixtes :</strong> Combinaison de plusieurs algorithmes pour des suggestions optimales.
+                {% elif recommendation_type == 'smart' %}
+                    <strong>Recommandations intelligentes :</strong> Basées sur votre dernier film regardé et vos préférences apprises automatiquement.
                 {% elif recommendation_type == 'content' %}
                     <strong>Basées sur le contenu :</strong> Films similaires à ceux que vous avez aimés (genres, thèmes).
                 {% elif recommendation_type == 'collaborative' %}

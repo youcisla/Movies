@@ -11,7 +11,7 @@
             {% endif %}
             
             <!-- Rating badge -->
-            {% if movie.vote_average %}
+            {% if movie.vote_average or movie.rating %}
             <div class="position-absolute top-0 end-0 m-2">
                 <span class="badge bg-yellow-400 text-dark shadow">
                     <i class="fas fa-star"></i> {{ movie.vote_average|floatformat:1 }}
@@ -42,9 +42,15 @@
                 {% if movie.release_date %}
                     {{ movie.release_date|date:"Y" }} • 
                 {% endif %}
-                {% for genre in movie.genres.all %}
-                    {{ genre.name }}{% if not forloop.last %}, {% endif %}
-                {% endfor %}
+                {% if movie.genres.all %}
+                    {% for genre in movie.genres.all %}
+                        {{ genre.name }}{% if not forloop.last %}, {% endif %}
+                    {% endfor %}
+                {% elif movie.genres %}
+                    {% for genre in movie.genres %}
+                        {{ genre }}{% if not forloop.last %}, {% endif %}
+                    {% endfor %}
+                {% endif %}
             </p>
             
             {% if movie.overview %}

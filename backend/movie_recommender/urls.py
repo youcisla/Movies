@@ -25,15 +25,13 @@ urlpatterns = [
     # Health check
     path('health/', health_check, name='health_check'),
     
-    # Main application
-    path('', include('movies.urls')),
+    # Movies app
+    path('movies/', include('movies.urls')),
     
     # API endpoints
-    path('api/', include([
-        path('recommendations/', include('recommendations.urls')),
-        path('analytics/', include('analytics.urls')),
-        path('accounts/', include('accounts.urls')),
-    ])),
+    path('api/analytics/', include('analytics.urls')),
+    path('api/dashboard-queries/', include('dashboard_queries.urls')),
+    path('api/user-profile/', include('user_profile.urls')),
 ]
 
 # Static and media files
@@ -46,7 +44,7 @@ if settings.DEBUG:
         try:
             import debug_toolbar
             urlpatterns = [
-                path('__debug__/', include(debug_toolbar.urls)),
+                # path('__debug__/', include(debug_toolbar.urls)),
             ] + urlpatterns
         except ImportError:
             pass

@@ -1,5 +1,5 @@
 from django.urls import path
-from . import views
+from movies import views
 
 app_name = 'movies'
 
@@ -31,6 +31,19 @@ urlpatterns = [
     path('register/', views.register_view, name='register'),
     
     # API
+    path('api/movies/', views.api_movies_list, name='api_movies_list'),
+    path('api/movies/<int:movie_id>/', views.api_movie_detail, name='api_movie_detail'),
+    path('api/movies/<int:movie_id>/reviews/', views.api_movie_reviews, name='api_movie_reviews'),
+    path('api/genres/', views.api_genres_list, name='api_genres_list'),
     path('api/popular/', views.api_popular_movies, name='api_popular_movies'),
     path('api/recommendations/', views.api_recommendations, name='api_recommendations'),
+    
+    # Dashboard
+    path('dashboard/', views.dashboard, name='dashboard'),
+    
+    # API Dashboard
+    path('api/intelligent-qa/', views.api_intelligent_qa, name='api_intelligent_qa'),
+    path('api/analytics/', views.api_analytics, name='api_analytics'),
+    path('api/user-profile/', views.api_user_profile, name='api_user_profile'),
+    path('api/dashboard-queries/', views.api_dashboard_queries, name='api_dashboard_queries'),
 ]
