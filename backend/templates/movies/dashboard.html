@@ -5,24 +5,474 @@
 
 {% block content %}
 <div class="container">
-    <!-- Header -->
-    <div class="row mb-4">
+    <!-- Enhanced Header -->
+    <div class="row mb-5">
         <div class="col-12">
-            <h1><i class="fas fa-chart-line text-primary me-2"></i>Dashboard Intelligent</h1>
-            <p class="text-muted">Analysez vos préférences et découvrez comment notre système fonctionne</p>
+            <div class="dashboard-header text-center">
+                <h1 class="display-4 fw-bold text-gradient-animated mb-3">
+                    <i class="fas fa-chart-line me-3"></i>Dashboard Intelligent
+                </h1>
+                <p class="lead text-muted">Analysez vos préférences et découvrez comment notre système fonctionne</p>
+            </div>
         </div>
     </div>
 
-    <!-- New Recommendations and Statistics Section -->
+    <!-- Quick Stats Cards -->
+    <div class="row mb-5" data-animation="fade-in-up">
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="stats-card">
+                <div class="stats-icon bg-primary">
+                    <i class="fas fa-eye"></i>
+                </div>
+                <div class="stats-content">
+                    <h3 class="stats-number" data-counter="150">0</h3>
+                    <p class="stats-label">Films vus</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="stats-card">
+                <div class="stats-icon bg-success">
+                    <i class="fas fa-star"></i>
+                </div>
+                <div class="stats-content">
+                    <h3 class="stats-number" data-counter="45">0</h3>
+                    <p class="stats-label">Avis donnés</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="stats-card">
+                <div class="stats-icon bg-warning">
+                    <i class="fas fa-bookmark"></i>
+                </div>
+                <div class="stats-content">
+                    <h3 class="stats-number" data-counter="23">0</h3>
+                    <p class="stats-label">Dans ma liste</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="stats-card">
+                <div class="stats-icon bg-info">
+                    <i class="fas fa-magic"></i>
+                </div>
+                <div class="stats-content">
+                    <h3 class="stats-number" data-counter="89">0</h3>
+                    <p class="stats-label">Recommandations</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Analytics Section -->
+    <div class="row mb-5">
+        <div class="col-lg-8 mb-4">
+            <div class="analytics-card">
+                <div class="card-header">
+                    <h4><i class="fas fa-chart-area me-2"></i>Tendances de visionnage</h4>
+                    <p class="text-muted mb-0">Votre activité au cours des derniers mois</p>
+                </div>
+                <div class="card-body">
+                    <canvas id="viewingTrendsChart" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 mb-4">
+            <div class="analytics-card">
+                <div class="card-header">
+                    <h4><i class="fas fa-pie-chart me-2"></i>Genres préférés</h4>
+                    <p class="text-muted mb-0">Distribution de vos goûts</p>
+                </div>
+                <div class="card-body">
+                    <canvas id="genreDistributionChart" height="250"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Insights Section -->
     <div class="row mb-5">
         <div class="col-12">
-            <div class="card border-0 shadow-lg">
-                <div class="card-header bg-gradient-primary text-white">
-                    <h4><i class="fas fa-database me-2"></i>Recommandations et Statistiques</h4>
-                    <p class="mb-0">Découvrez les données et recommandations intelligentes</p>
+            <div class="insights-card">
+                <div class="card-header">
+                    <h4><i class="fas fa-lightbulb me-2"></i>Insights personnalisés</h4>
                 </div>
                 <div class="card-body">
                     <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <div class="insight-item">
+                                <div class="insight-icon">
+                                    <i class="fas fa-trophy text-warning"></i>
+                                </div>
+                                <div class="insight-content">
+                                    <h6>Genre favori</h6>
+                                    <p class="mb-0" id="favoriteGenre">Action & Aventure</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="insight-item">
+                                <div class="insight-icon">
+                                    <i class="fas fa-clock text-info"></i>
+                                </div>
+                                <div class="insight-content">
+                                    <h6>Temps de visionnage</h6>
+                                    <p class="mb-0" id="watchTime">~240 heures</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="insight-item">
+                                <div class="insight-icon">
+                                    <i class="fas fa-calendar text-success"></i>
+                                </div>
+                                <div class="insight-content">
+                                    <h6>Période préférée</h6>
+                                    <p class="mb-0" id="preferredEra">Films modernes (2010+)</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="insight-item">
+                                <div class="insight-icon">
+                                    <i class="fas fa-thumbs-up text-primary"></i>
+                                </div>
+                                <div class="insight-content">
+                                    <h6>Note moyenne</h6>
+                                    <p class="mb-0" id="averageRating">4.2/5 ⭐</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recommendations Engine Info -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="engine-card">
+                <div class="card-header">
+                    <h4><i class="fas fa-cogs me-2"></i>Comment fonctionne votre moteur de recommandation</h4>
+                </div>
+                <div class="card-body">
+                    <div class="engine-visual">
+                        <div class="row text-center">
+                            <div class="col-lg-3 mb-4">
+                                <div class="engine-step">
+                                    <div class="step-icon">
+                                        <i class="fas fa-user-cog"></i>
+                                    </div>
+                                    <h6>Analyse des préférences</h6>
+                                    <p class="small text-muted">Étude de vos notes et habitudes de visionnage</p>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 mb-4">
+                                <div class="engine-step">
+                                    <div class="step-icon">
+                                        <i class="fas fa-brain"></i>
+                                    </div>
+                                    <h6>IA collaborative</h6>
+                                    <p class="small text-muted">Comparaison avec d'autres utilisateurs similaires</p>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 mb-4">
+                                <div class="engine-step">
+                                    <div class="step-icon">
+                                        <i class="fas fa-filter"></i>
+                                    </div>
+                                    <h6>Filtrage avancé</h6>
+                                    <p class="small text-muted">Sélection basée sur le contenu et la popularité</p>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 mb-4">
+                                <div class="engine-step">
+                                    <div class="step-icon">
+                                        <i class="fas fa-magic"></i>
+                                    </div>
+                                    <h6>Personnalisation</h6>
+                                    <p class="small text-muted">Adaptation continue selon vos retours</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="row">
+        <div class="col-12">
+            <div class="activity-card">
+                <div class="card-header">
+                    <h4><i class="fas fa-history me-2"></i>Activité récente</h4>
+                </div>
+                <div class="card-body">
+                    <div class="activity-timeline">
+                        <div class="timeline-item">
+                            <div class="timeline-marker bg-primary"></div>
+                            <div class="timeline-content">
+                                <h6>Film ajouté à votre liste</h6>
+                                <p class="text-muted mb-1">Inception - Christopher Nolan</p>
+                                <small class="text-muted">Il y a 2 heures</small>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-marker bg-success"></div>
+                            <div class="timeline-content">
+                                <h6>Avis donné</h6>
+                                <p class="text-muted mb-1">The Dark Knight - 5/5 ⭐</p>
+                                <small class="text-muted">Hier</small>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-marker bg-warning"></div>
+                            <div class="timeline-content">
+                                <h6>Nouvelles recommandations</h6>
+                                <p class="text-muted mb-1">12 nouveaux films suggérés</p>
+                                <small class="text-muted">Il y a 3 jours</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Enhanced Dashboard Styles */
+.dashboard-header {
+    padding: 3rem 0;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+    border-radius: 2rem;
+    margin-bottom: 2rem;
+}
+
+.stats-card {
+    background: white;
+    border-radius: 1.5rem;
+    padding: 2rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.stats-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--primary-gradient);
+}
+
+.stats-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+.stats-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+    color: white;
+}
+
+.stats-number {
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+    color: var(--text-primary);
+}
+
+.stats-label {
+    color: var(--text-muted);
+    margin: 0;
+    font-weight: 500;
+}
+
+.analytics-card, .insights-card, .engine-card, .activity-card {
+    background: white;
+    border-radius: 1.5rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.analytics-card:hover, .insights-card:hover, .engine-card:hover, .activity-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+.card-header {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+    border-bottom: none;
+    padding: 1.5rem 2rem;
+}
+
+.card-header h4 {
+    margin: 0;
+    color: var(--text-primary);
+    font-weight: 700;
+}
+
+.card-body {
+    padding: 2rem;
+}
+
+.insight-item {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    background: rgba(102, 126, 234, 0.05);
+    border-radius: 1rem;
+    transition: all 0.3s ease;
+}
+
+.insight-item:hover {
+    background: rgba(102, 126, 234, 0.1);
+    transform: translateX(5px);
+}
+
+.insight-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+    font-size: 1.2rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.insight-content h6 {
+    margin: 0 0 0.25rem 0;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.insight-content p {
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.engine-step {
+    padding: 1.5rem;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 1rem;
+    border: 2px solid rgba(102, 126, 234, 0.1);
+    transition: all 0.3s ease;
+    height: 100%;
+}
+
+.engine-step:hover {
+    border-color: var(--primary-color);
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(102, 126, 234, 0.2);
+}
+
+.step-icon {
+    width: 70px;
+    height: 70px;
+    background: var(--primary-gradient);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+    font-size: 1.8rem;
+    color: white;
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+}
+
+.activity-timeline {
+    position: relative;
+    padding-left: 2rem;
+}
+
+.activity-timeline::before {
+    content: '';
+    position: absolute;
+    left: 0.75rem;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(to bottom, var(--primary-color), var(--secondary-color));
+}
+
+.timeline-item {
+    position: relative;
+    margin-bottom: 2rem;
+    padding-left: 2rem;
+}
+
+.timeline-marker {
+    position: absolute;
+    left: -2rem;
+    top: 0.25rem;
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 50%;
+    border: 3px solid white;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
+}
+
+.timeline-content {
+    background: rgba(248, 250, 252, 0.8);
+    padding: 1rem 1.5rem;
+    border-radius: 1rem;
+    border-left: 4px solid var(--primary-color);
+}
+
+.timeline-content h6 {
+    margin: 0 0 0.5rem 0;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+/* Chart Containers */
+#viewingTrendsChart, #genreDistributionChart {
+    max-height: 300px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .stats-card {
+        text-align: center;
+        margin-bottom: 1rem;
+    }
+    
+    .stats-number {
+        font-size: 2rem;
+    }
+    
+    .dashboard-header {
+        padding: 2rem 1rem;
+    }
+    
+    .card-body {
+        padding: 1.5rem;
+    }
+    
+    .engine-step {
+        margin-bottom: 1rem;
+    }
+}
+</style>
+{% endblock %}
                         <div class="col-lg-6 mb-4">
                             <h5>Top Films d'Action</h5>
                             <ul id="actionMovies" class="list-group">

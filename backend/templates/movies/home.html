@@ -6,120 +6,663 @@
 {% block content %}
 <div class="container-fluid p-0 min-vh-100">
     <!-- Hero Banner glassmorphism -->
-    <section class="hero-section position-relative d-flex align-items-center justify-content-center" style="height: 60vh; background: linear-gradient(120deg, #f8fafc 60%, #e0e7ff 100%);">
-        <div class="glass position-absolute top-50 start-0 translate-middle-y ps-5 py-5 px-5" style="z-index:2; max-width: 600px;">
-            <h1 class="display-2 fw-bold mb-3 text-primary" style="text-shadow: 0 2px 16px #fff;">Découvrez vos prochains <span class="text-gradient" style="background: linear-gradient(90deg,#7f5af0,#2ec4b6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">films préférés</span></h1>
-            <p class="lead mb-4 text-secondary">Un système de recommandation élégant, moderne et personnalisé.</p>
+    <section class="hero-section position-relative d-flex align-items-center justify-content-center" style="height: 70vh; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); margin-bottom: 3rem;">
+        <div class="hero-overlay"></div>
+        <div class="hero-content text-center text-white" style="z-index: 2; max-width: 800px;">
+            <h1 class="hero-title display-1 fw-bold mb-4">
+                Découvrez vos prochains 
+                <span class="text-highlight">films préférés</span>
+            </h1>
+            <p class="hero-subtitle lead mb-5">
+                Un système de recommandation intelligent alimenté par l'IA pour une expérience cinématographique personnalisée
+            </p>
             {% if not user.is_authenticated %}
-            <div class="d-flex gap-3">
-                <a href="{% url 'movies:register' %}" class="btn btn-gradient btn-lg shadow-lg px-4 btn-pill">
-                    <i class="fas fa-user-plus me-2"></i>Commencer
+            <div class="d-flex gap-3 justify-content-center flex-wrap">
+                <a href="{% url 'movies:register' %}" class="btn btn-hero btn-lg px-5 py-3">
+                    <i class="fas fa-rocket me-2"></i>Commencer l'aventure
                 </a>
-                <a href="{% url 'movies:movie_list' %}" class="btn btn-outline-primary btn-lg px-4 btn-pill">
-                    <i class="fas fa-play me-2"></i>Explorer
+                <a href="{% url 'movies:movie_list' %}" class="btn btn-hero-outline btn-lg px-5 py-3">
+                    <i class="fas fa-compass me-2"></i>Explorer maintenant
                 </a>
+            </div>
+            {% else %}
+            <div class="hero-stats d-flex justify-content-center gap-4 flex-wrap">
+                <div class="stat-item">
+                    <div class="stat-number">{{ user_reviews_count }}</div>
+                    <div class="stat-label">Avis donnés</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">{{ watchlist_count }}</div>
+                    <div class="stat-label">Films à voir</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">{{ recommended_movies|length }}</div>
+                    <div class="stat-label">Recommandations</div>
+                </div>
             </div>
             {% endif %}
         </div>
-    </section>
-
-    <!-- Statistiques utilisateur -->
-    {% if user.is_authenticated %}
-    <section class="user-stats mb-5">
-        <div class="row" style="margin-top: 30px;">
-            <div class="col-md-4">
-                <div class="card border-0 shadow-sm">
-                    <div class="card-body text-center">
-                        <i class="fas fa-star text-warning mb-3" style="font-size: 2rem;"></i>
-                        <h5 class="card-title">{{ user_reviews_count }}</h5>
-                        <p class="card-text">Avis donnés</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card border-0 shadow-sm">
-                    <div class="card-body text-center">
-                        <i class="fas fa-bookmark text-primary mb-3" style="font-size: 2rem;"></i>
-                        <h5 class="card-title">{{ watchlist_count }}</h5>
-                        <p class="card-text">Films à regarder</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card border-0 shadow-sm">
-                    <div class="card-body text-center">
-                        <i class="fas fa-magic text-success mb-3" style="font-size: 2rem;"></i>
-                        <h5 class="card-title">{{ recommended_movies|length }}</h5>
-                        <p class="card-text">Recommandations</p>
-                    </div>
-                </div>
-            </div>
+        
+        <!-- Floating elements -->
+        <div class="floating-elements">
+            <div class="floating-element element-1"><i class="fas fa-film"></i></div>
+            <div class="floating-element element-2"><i class="fas fa-star"></i></div>
+            <div class="floating-element element-3"><i class="fas fa-heart"></i></div>
+            <div class="floating-element element-4"><i class="fas fa-magic"></i></div>
         </div>
     </section>
-    {% endif %}
 
-    <!-- Carrousel horizontal Netflix-like pour les recommandations -->
+    <!-- Recommendation Section -->
     {% if user.is_authenticated and recommended_movies %}
-    <section class="recommendations-section mb-5 px-4">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <h2 class="text-primary"><i class="fas fa-star text-gradient me-2" style="background: linear-gradient(90deg,#7f5af0,#2ec4b6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;"></i>Recommandé pour vous</h2>
-            <a href="{% url 'movies:recommendations' %}" class="btn btn-gradient btn-pill">Voir tout <i class="fas fa-arrow-right ms-1"></i></a>
-        </div>
-        <div class="overflow-auto flex-nowrap d-flex gap-4 pb-2" style="scrollbar-width: thin;">
-            {% for movie in recommended_movies %}
-            <div class="glass p-2" style="min-width: 220px; max-width: 220px;">
-                {% include 'movies/movie_card.html' %}
+    <section class="recommendations-section mb-5">
+        <div class="container">
+            <div class="section-header text-center mb-5">
+                <h2 class="section-title">
+                    <i class="fas fa-sparkles me-3"></i>
+                    Spécialement pour vous
+                </h2>
+                <p class="section-subtitle">Des recommandations personnalisées basées sur vos préférences</p>
             </div>
-            {% endfor %}
+            
+            <div class="movies-carousel">
+                <div class="carousel-container">
+                    {% for movie in recommended_movies %}
+                    <div class="carousel-item">
+                        {% include 'movies/movie_card.html' %}
+                    </div>
+                    {% endfor %}
+                </div>
+                <button class="carousel-btn carousel-btn-prev" onclick="slideCarousel('recommendations', -1)">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <button class="carousel-btn carousel-btn-next" onclick="slideCarousel('recommendations', 1)">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+            
+            <div class="text-center mt-4">
+                <a href="{% url 'movies:recommendations' %}" class="btn btn-outline-primary btn-lg">
+                    Voir toutes les recommandations <i class="fas fa-arrow-right ms-2"></i>
+                </a>
+            </div>
         </div>
     </section>
     {% endif %}
 
-    <!-- Carrousel horizontal Netflix-like pour les films populaires -->
-    <section class="popular-section mb-5 px-4">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <h2 class="text-primary"><i class="fas fa-fire text-gradient me-2" style="background: linear-gradient(90deg,#ff5e62,#2ec4b6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;"></i>Films populaires</h2>
-            <a href="{% url 'movies:movie_list' %}" class="btn btn-gradient btn-pill">Voir tout <i class="fas fa-arrow-right ms-1"></i></a>
-        </div>
-        <div class="overflow-auto flex-nowrap d-flex gap-4 pb-2" style="scrollbar-width: thin;">
-            {% for movie in popular_movies %}
-            <div class="glass p-2" style="min-width: 220px; max-width: 220px;">
-                {% include 'movies/movie_card.html' %}
+    <!-- Popular Movies Section -->
+    <section class="popular-section mb-5">
+        <div class="container">
+            <div class="section-header text-center mb-5">
+                <h2 class="section-title">
+                    <i class="fas fa-fire me-3"></i>
+                    Tendances du moment
+                </h2>
+                <p class="section-subtitle">Les films les plus populaires actuellement</p>
             </div>
-            {% endfor %}
+            
+            <div class="movies-carousel">
+                <div class="carousel-container" id="popularCarousel">
+                    {% for movie in popular_movies %}
+                    <div class="carousel-item">
+                        {% include 'movies/movie_card.html' %}
+                    </div>
+                    {% endfor %}
+                </div>
+                <button class="carousel-btn carousel-btn-prev" onclick="slideCarousel('popular', -1)">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <button class="carousel-btn carousel-btn-next" onclick="slideCarousel('popular', 1)">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+            
+            <div class="text-center mt-4">
+                <a href="{% url 'movies:movie_list' %}" class="btn btn-outline-primary btn-lg">
+                    Découvrir plus de films <i class="fas fa-arrow-right ms-2"></i>
+                </a>
+            </div>
         </div>
     </section>
 
-    <!-- Genres en carrousel horizontal -->
-    <section class="genres-section mb-5 px-4">
-        <h2 class="mb-3 text-primary"><i class="fas fa-tags text-gradient me-2" style="background: linear-gradient(90deg,#7f5af0,#2ec4b6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;"></i>Explorer par genre</h2>
-        <div class="overflow-auto flex-nowrap d-flex gap-4 pb-2" style="scrollbar-width: thin;">
-            {% for genre in genres %}
-            <a href="{% url 'movies:movies_by_genre' genre.id %}" class="text-decoration-none" style="min-width: 180px; max-width: 180px;">
-                <div class="glass h-100 genre-card text-center py-4 hover:bg-primary hover:text-white transition">
-                    <h5 class="card-title text-primary">{{ genre.name }}</h5>
+    <!-- Genres Section -->
+    <section class="genres-section mb-5">
+        <div class="container">
+            <div class="section-header text-center mb-5">
+                <h2 class="section-title">
+                    <i class="fas fa-tags me-3"></i>
+                    Explorer par genre
+                </h2>
+                <p class="section-subtitle">Trouvez votre film idéal selon vos goûts</p>
+            </div>
+            
+            <div class="genres-grid">
+                {% for genre in genres %}
+                <a href="{% url 'movies:movies_by_genre' genre.id %}" class="genre-card-link">
+                    <div class="genre-card">
+                        <div class="genre-icon">
+                            <i class="fas fa-{% cycle 'drama-masks' 'laugh' 'rocket' 'heart' 'ghost' 'fist-raised' 'magic' 'child' %}"></i>
+                        </div>
+                        <h5 class="genre-name">{{ genre.name }}</h5>
+                        <div class="genre-overlay"></div>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features-section py-5" style="background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);">
+        <div class="container">
+            <div class="section-header text-center mb-5">
+                <h2 class="section-title">Pourquoi choisir MovieRec ?</h2>
+                <p class="section-subtitle">Une expérience cinématographique révolutionnaire</p>
+            </div>
+            
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-brain"></i>
+                        </div>
+                        <h4>IA Avancée</h4>
+                        <p>Notre algorithme d'intelligence artificielle analyse vos préférences pour des recommandations ultra-précises.</p>
+                    </div>
                 </div>
-            </a>
-            {% endfor %}
+                <div class="col-md-4">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <h4>Communauté</h4>
+                        <p>Partagez vos avis, découvrez ce que pensent les autres cinéphiles et enrichissez votre expérience.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-mobile-alt"></i>
+                        </div>
+                        <h4>Design Moderne</h4>
+                        <p>Interface intuitive et responsive, optimisée pour tous vos appareils avec une expérience fluide.</p>
+                    </div>
+                </div>
+            </div>
         </div>
     </section>
 </div>
+
+<style>
+/* Enhanced Hero Section */
+.hero-section {
+    position: relative;
+    overflow: hidden;
+    border-radius: 0 0 3rem 3rem;
+}
+
+.hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.3);
+    z-index: 1;
+}
+
+.hero-title {
+    font-size: 4rem;
+    font-weight: 800;
+    line-height: 1.1;
+    margin-bottom: 2rem;
+}
+
+.text-highlight {
+    background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.hero-subtitle {
+    font-size: 1.25rem;
+    opacity: 0.9;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.btn-hero {
+    background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+    color: #2d3748;
+    border: none;
+    border-radius: 50px;
+    font-weight: 700;
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 25px rgba(255, 215, 0, 0.3);
+}
+
+.btn-hero:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 35px rgba(255, 215, 0, 0.5);
+    color: #2d3748;
+}
+
+.btn-hero-outline {
+    background: transparent;
+    color: white;
+    border: 2px solid white;
+    border-radius: 50px;
+    font-weight: 700;
+    transition: all 0.3s ease;
+}
+
+.btn-hero-outline:hover {
+    background: white;
+    color: #667eea;
+    transform: translateY(-3px);
+    box-shadow: 0 12px 35px rgba(255, 255, 255, 0.3);
+}
+
+/* Hero Stats */
+.hero-stats {
+    margin-top: 3rem;
+}
+
+.stat-item {
+    text-align: center;
+    padding: 1rem;
+}
+
+.stat-number {
+    font-size: 3rem;
+    font-weight: 800;
+    color: #ffd700;
+    line-height: 1;
+}
+
+.stat-label {
+    font-size: 1rem;
+    opacity: 0.9;
+    margin-top: 0.5rem;
+}
+
+/* Floating Elements */
+.floating-elements {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+}
+
+.floating-element {
+    position: absolute;
+    color: rgba(255, 255, 255, 0.1);
+    font-size: 2rem;
+    animation: float 6s ease-in-out infinite;
+}
+
+.element-1 {
+    top: 20%;
+    left: 10%;
+    animation-delay: 0s;
+}
+
+.element-2 {
+    top: 60%;
+    right: 15%;
+    animation-delay: 2s;
+}
+
+.element-3 {
+    bottom: 30%;
+    left: 20%;
+    animation-delay: 4s;
+}
+
+.element-4 {
+    top: 40%;
+    right: 30%;
+    animation-delay: 1s;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    33% { transform: translateY(-20px) rotate(5deg); }
+    66% { transform: translateY(10px) rotate(-5deg); }
+}
+
+/* Section Headers */
+.section-header {
+    margin-bottom: 3rem;
+}
+
+.section-title {
+    font-size: 3rem;
+    font-weight: 700;
+    color: #2d3748;
+    margin-bottom: 1rem;
+}
+
+.section-subtitle {
+    font-size: 1.1rem;
+    color: #718096;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* Enhanced Carousels */
+.movies-carousel {
+    position: relative;
+    overflow: hidden;
+    margin: 2rem 0;
+}
+
+.carousel-container {
+    display: flex;
+    gap: 2rem;
+    transition: transform 0.5s ease;
+    padding: 1rem 0;
+}
+
+.carousel-item {
+    flex: 0 0 300px;
+    max-width: 300px;
+}
+
+.carousel-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    font-size: 1.2rem;
+    z-index: 10;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.carousel-btn:hover {
+    transform: translateY(-50%) scale(1.1);
+    box-shadow: 0 6px 25px rgba(102, 126, 234, 0.5);
+}
+
+.carousel-btn-prev {
+    left: -25px;
+}
+
+.carousel-btn-next {
+    right: -25px;
+}
+
+/* Genre Cards */
+.genres-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 2rem;
+    padding: 2rem 0;
+}
+
+.genre-card-link {
+    text-decoration: none;
+    color: inherit;
+}
+
+.genre-card {
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    border-radius: 1.5rem;
+    padding: 2.5rem 2rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.4s ease;
+    border: 2px solid transparent;
+    min-height: 180px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.genre-card:hover {
+    transform: translateY(-10px) scale(1.02);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    border-color: #667eea;
+}
+
+.genre-icon {
+    font-size: 3rem;
+    color: #667eea;
+    margin-bottom: 1rem;
+    transition: all 0.3s ease;
+}
+
+.genre-card:hover .genre-icon {
+    transform: scale(1.2);
+    color: #764ba2;
+}
+
+.genre-name {
+    font-weight: 700;
+    color: #2d3748;
+    margin: 0;
+    transition: color 0.3s ease;
+}
+
+.genre-card:hover .genre-name {
+    color: #667eea;
+}
+
+.genre-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.genre-card:hover .genre-overlay {
+    opacity: 0.05;
+}
+
+/* Feature Cards */
+.feature-card {
+    background: white;
+    border-radius: 1.5rem;
+    padding: 2.5rem 2rem;
+    text-align: center;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+    height: 100%;
+}
+
+.feature-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    border-color: #667eea;
+}
+
+.feature-icon {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    font-size: 2rem;
+    color: white;
+    transition: all 0.3s ease;
+}
+
+.feature-card:hover .feature-icon {
+    transform: scale(1.1);
+    box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+}
+
+.feature-card h4 {
+    font-weight: 700;
+    color: #2d3748;
+    margin-bottom: 1rem;
+}
+
+.feature-card p {
+    color: #718096;
+    line-height: 1.6;
+    margin: 0;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .hero-title {
+        font-size: 2.5rem;
+    }
+    
+    .section-title {
+        font-size: 2rem;
+    }
+    
+    .carousel-item {
+        flex: 0 0 250px;
+        max-width: 250px;
+    }
+    
+    .genres-grid {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 1rem;
+    }
+    
+    .genre-card {
+        padding: 2rem 1.5rem;
+        min-height: 150px;
+    }
+    
+    .hero-stats {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .stat-number {
+        font-size: 2rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .hero-title {
+        font-size: 2rem;
+    }
+    
+    .hero-subtitle {
+        font-size: 1rem;
+    }
+    
+    .carousel-btn {
+        width: 40px;
+        height: 40px;
+        font-size: 1rem;
+    }
+    
+    .carousel-btn-prev {
+        left: -20px;
+    }
+    
+    .carousel-btn-next {
+        right: -20px;
+    }
+    
+    .floating-element {
+        display: none;
+    }
+}
+</style>
 {% endblock %}
 
 {% block scripts %}
 <script>
-// Animation pour les cartes de genre
+// Enhanced carousel functionality
+let carouselPositions = {
+    recommendations: 0,
+    popular: 0
+};
+
+function slideCarousel(carouselType, direction) {
+    const carousel = document.getElementById(carouselType === 'recommendations' ? 'recommendationsCarousel' : 'popularCarousel') 
+                    || document.querySelector(`#${carouselType}Carousel .carousel-container`)
+                    || document.querySelector('.carousel-container');
+    
+    if (!carousel) return;
+    
+    const items = carousel.children;
+    const itemWidth = 320; // 300px + 20px gap
+    const visibleItems = Math.floor(carousel.parentElement.offsetWidth / itemWidth);
+    const maxPosition = Math.max(0, items.length - visibleItems);
+    
+    carouselPositions[carouselType] += direction;
+    carouselPositions[carouselType] = Math.max(0, Math.min(maxPosition, carouselPositions[carouselType]));
+    
+    carousel.style.transform = `translateX(-${carouselPositions[carouselType] * itemWidth}px)`;
+}
+
+// Auto-slide functionality
+function autoSlide() {
+    Object.keys(carouselPositions).forEach(carouselType => {
+        const carousel = document.querySelector('.carousel-container');
+        if (carousel && carousel.children.length > 3) {
+            slideCarousel(carouselType, 1);
+            if (carouselPositions[carouselType] >= carousel.children.length - 3) {
+                carouselPositions[carouselType] = -1; // Will be set to 0 by slideCarousel
+            }
+        }
+    });
+}
+
+// Initialize auto-slide
+setInterval(autoSlide, 5000);
+
+// Smooth scrolling for anchor links
 document.addEventListener('DOMContentLoaded', function() {
+    // Add smooth scrolling animation to genre cards
     const genreCards = document.querySelectorAll('.genre-card');
     
-    genreCards.forEach(card => {
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+    
+    const observer = new IntersectionObserver(function(entries) {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = '1';
+                entry.target.style.transform = 'translateY(0)';
+            }
+        });
+    }, observerOptions);
+    
+    genreCards.forEach((card, index) => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(30px)';
+        card.style.transition = `opacity 0.6s ease ${index * 0.1}s, transform 0.6s ease ${index * 0.1}s`;
+        observer.observe(card);
+    });
+    
+    // Enhanced hover effects for feature cards
+    document.querySelectorAll('.feature-card').forEach(card => {
         card.addEventListener('mouseenter', function() {
-            this.style.transform = 'translateY(-5px)';
-            this.style.transition = 'transform 0.3s ease';
+            this.style.transform = 'translateY(-12px) scale(1.02)';
         });
         
         card.addEventListener('mouseleave', function() {
-            this.style.transform = 'translateY(0)';
+            this.style.transform = 'translateY(0) scale(1)';
         });
     });
 });

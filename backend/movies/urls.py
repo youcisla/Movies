@@ -31,6 +31,7 @@ urlpatterns = [
     path('register/', views.register_view, name='register'),
     
     # API
+    path('api/search/suggestions/', views.api_search_suggestions, name='api_search_suggestions'),
     path('api/movies/', views.api_movies_list, name='api_movies_list'),
     path('api/movies/<int:movie_id>/', views.api_movie_detail, name='api_movie_detail'),
     path('api/movies/<int:movie_id>/reviews/', views.api_movie_reviews, name='api_movie_reviews'),

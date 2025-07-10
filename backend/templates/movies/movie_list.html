@@ -5,14 +5,497 @@
 
 {% block content %}
 <div class="container">
-    <!-- Header avec filtres -->
+    <!-- Enhanced Header -->
     <div class="row mb-4">
         <div class="col-12">
-            <h1 class="text-3xl font-bold mb-3"><i class="fas fa-film me-2 text-indigo-500"></i>Films</h1>
-            <!-- Filtres modernisés -->
-            <div class="card border-0 shadow-lg bg-gradient-to-r from-gray-100 to-gray-200">
+            <div class="page-header">
+                <h1 class="display-4 fw-bold text-gradient mb-3">
+                    <i class="fas fa-film me-3"></i>Découvrez des films
+                </h1>
+                <p class="lead text-muted">Explorez notre collection de films avec des filtres avancés</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Advanced Filters -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="filters-card">
+                <div class="card-header">
+                    <h5><i class="fas fa-filter me-2"></i>Filtres avancés</h5>
+                    <button type="button" class="btn btn-outline-secondary btn-sm" onclick="resetFilters()">
+                        <i class="fas fa-undo me-1"></i>Réinitialiser
+                    </button>
+                </div>
                 <div class="card-body">
-                    <form method="get" class="row g-3 items-end">
+                    <form method="get" class="filter-form" id="filterForm">
+                        <div class="row g-3">
+                            <!-- Search -->
+                            <div class="col-lg-3 col-md-6">
+                                <label class="form-label fw-semibold">Recherche</label>
+                                <div class="search-input-group">
+                                    <i class="fas fa-search search-icon"></i>
+                                    <input type="text" 
+                                           class="form-control search-input" 
+                                           name="search" 
+                                           placeholder="Titre, acteur, réalisateur..."
+                                           value="{{ current_search }}"
+                                           autocomplete="off">
+                                </div>
+                            </div>
+                            
+                            <!-- Genre -->
+                            <div class="col-lg-2 col-md-6">
+                                <label class="form-label fw-semibold">Genre</label>
+                                <select class="form-select" name="genre">
+                                    <option value="">Tous les genres</option>
+                                    {% for genre in genres %}
+                                    <option value="{{ genre.id }}" {% if current_genre == genre.id|stringformat:"s" %}selected{% endif %}>
+                                        {{ genre.name }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            
+                            <!-- Year Range -->
+                            <div class="col-lg-2 col-md-6">
+                                <label class="form-label fw-semibold">Année</label>
+                                <select class="form-select" name="year">
+                                    <option value="">Toutes les années</option>
+                                    <option value="2020-2024" {% if current_year == "2020-2024" %}selected{% endif %}>2020-2024</option>
+                                    <option value="2010-2019" {% if current_year == "2010-2019" %}selected{% endif %}>2010-2019</option>
+                                    <option value="2000-2009" {% if current_year == "2000-2009" %}selected{% endif %}>2000-2009</option>
+                                    <option value="1990-1999" {% if current_year == "1990-1999" %}selected{% endif %}>1990-1999</option>
+                                    <option value="1980-1989" {% if current_year == "1980-1989" %}selected{% endif %}>1980-1989</option>
+                                </select>
+                            </div>
+                            
+                            <!-- Rating -->
+                            <div class="col-lg-2 col-md-6">
+                                <label class="form-label fw-semibold">Note minimale</label>
+                                <select class="form-select" name="rating">
+                                    <option value="">Toutes les notes</option>
+                                    <option value="8" {% if current_rating == "8" %}selected{% endif %}>8+ ⭐</option>
+                                    <option value="7" {% if current_rating == "7" %}selected{% endif %}>7+ ⭐</option>
+                                    <option value="6" {% if current_rating == "6" %}selected{% endif %}>6+ ⭐</option>
+                                    <option value="5" {% if current_rating == "5" %}selected{% endif %}>5+ ⭐</option>
+                                </select>
+                            </div>
+                            
+                            <!-- Sort -->
+                            <div class="col-lg-2 col-md-6">
+                                <label class="form-label fw-semibold">Trier par</label>
+                                <select class="form-select" name="sort">
+                                    <option value="-popularity" {% if current_sort == "-popularity" %}selected{% endif %}>
+                                        Popularité
+                                    </option>
+                                    <option value="-vote_average" {% if current_sort == "-vote_average" %}selected{% endif %}>
+                                        Note
+                                    </option>
+                                    <option value="-release_date" {% if current_sort == "-release_date" %}selected{% endif %}>
+                                        Plus récents
+                                    </option>
+                                    <option value="release_date" {% if current_sort == "release_date" %}selected{% endif %}>
+                                        Plus anciens
+                                    </option>
+                                    <option value="title" {% if current_sort == "title" %}selected{% endif %}>
+                                        Titre A-Z
+                                    </option>
+                                </select>
+                            </div>
+                            
+                            <!-- Submit Button -->
+                            <div class="col-lg-1 col-md-12">
+                                <label class="form-label d-none d-lg-block">&nbsp;</label>
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Results Summary -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="results-summary">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="results-info">
+                        <h5 class="mb-1">
+                            <span class="results-count">{{ movies|length }}</span> 
+                            film{{ movies|length|pluralize }} trouvé{{ movies|length|pluralize }}
+                        </h5>
+                        {% if current_search or current_genre or current_year or current_rating %}
+                        <div class="active-filters">
+                            {% if current_search %}
+                                <span class="filter-tag">
+                                    <i class="fas fa-search me-1"></i>{{ current_search }}
+                                    <button type="button" class="btn-close-filter" onclick="removeFilter('search')">×</button>
+                                </span>
+                            {% endif %}
+                            {% if current_genre %}
+                                <span class="filter-tag">
+                                    <i class="fas fa-tag me-1"></i>{{ genres|first.name }}
+                                    <button type="button" class="btn-close-filter" onclick="removeFilter('genre')">×</button>
+                                </span>
+                            {% endif %}
+                            {% if current_year %}
+                                <span class="filter-tag">
+                                    <i class="fas fa-calendar me-1"></i>{{ current_year }}
+                                    <button type="button" class="btn-close-filter" onclick="removeFilter('year')">×</button>
+                                </span>
+                            {% endif %}
+                            {% if current_rating %}
+                                <span class="filter-tag">
+                                    <i class="fas fa-star me-1"></i>{{ current_rating }}+ ⭐
+                                    <button type="button" class="btn-close-filter" onclick="removeFilter('rating')">×</button>
+                                </span>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="view-options">
+                        <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-outline-secondary active" onclick="setView('grid')">
+                                <i class="fas fa-th"></i>
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary" onclick="setView('list')">
+                                <i class="fas fa-list"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                {% if page_obj.paginator.count %}
+                <small class="text-muted mt-2 d-block">
+                    Affichage de {{ page_obj.start_index }} à {{ page_obj.end_index }} sur {{ page_obj.paginator.count }} résultats
+                </small>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Movies Grid -->
+    <div class="row" id="moviesGrid" data-animation="fade-in-up">
+        {% for movie in movies %}
+        <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 mb-4 movie-grid-item">
+            {% include 'movies/movie_card.html' %}
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="no-results">
+                <div class="text-center py-5">
+                    <div class="no-results-icon">
+                        <i class="fas fa-film"></i>
+                    </div>
+                    <h4 class="mt-3 mb-2">Aucun film trouvé</h4>
+                    <p class="text-muted mb-4">Essayez de modifier vos critères de recherche ou explorez d'autres genres</p>
+                    <div class="d-flex gap-2 justify-content-center flex-wrap">
+                        <button type="button" class="btn btn-primary" onclick="resetFilters()">
+                            <i class="fas fa-undo me-1"></i>Réinitialiser les filtres
+                        </button>
+                        <a href="{% url 'movies:movie_list' %}" class="btn btn-outline-primary">
+                            <i class="fas fa-compass me-1"></i>Explorer tous les films
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Enhanced Pagination -->
+    {% if page_obj.paginator.num_pages > 1 %}
+    <div class="row">
+        <div class="col-12">
+            <nav aria-label="Pagination des films" class="pagination-nav">
+                <ul class="pagination justify-content-center">
+                    {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page=1{% if current_search %}&search={{ current_search }}{% endif %}{% if current_genre %}&genre={{ current_genre }}{% endif %}{% if current_year %}&year={{ current_year }}{% endif %}{% if current_rating %}&rating={{ current_rating }}{% endif %}{% if current_sort %}&sort={{ current_sort }}{% endif %}">
+                            <i class="fas fa-angle-double-left"></i>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if current_search %}&search={{ current_search }}{% endif %}{% if current_genre %}&genre={{ current_genre }}{% endif %}{% if current_year %}&year={{ current_year }}{% endif %}{% if current_rating %}&rating={{ current_rating }}{% endif %}{% if current_sort %}&sort={{ current_sort }}{% endif %}">
+                            <i class="fas fa-chevron-left"></i>
+                        </a>
+                    </li>
+                    {% endif %}
+                    
+                    {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                    <li class="page-item active">
+                        <span class="page-link">{{ num }}</span>
+                    </li>
+                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ num }}{% if current_search %}&search={{ current_search }}{% endif %}{% if current_genre %}&genre={{ current_genre }}{% endif %}{% if current_year %}&year={{ current_year }}{% endif %}{% if current_rating %}&rating={{ current_rating }}{% endif %}{% if current_sort %}&sort={{ current_sort }}{% endif %}">
+                            {{ num }}
+                        </a>
+                    </li>
+                    {% endif %}
+                    {% endfor %}
+                    
+                    {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if current_search %}&search={{ current_search }}{% endif %}{% if current_genre %}&genre={{ current_genre }}{% endif %}{% if current_year %}&year={{ current_year }}{% endif %}{% if current_rating %}&rating={{ current_rating }}{% endif %}{% if current_sort %}&sort={{ current_sort }}{% endif %}">
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if current_search %}&search={{ current_search }}{% endif %}{% if current_genre %}&genre={{ current_genre }}{% endif %}{% if current_year %}&year={{ current_year }}{% endif %}{% if current_rating %}&rating={{ current_rating }}{% endif %}{% if current_sort %}&sort={{ current_sort }}{% endif %}">
+                            <i class="fas fa-angle-double-right"></i>
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+/* Enhanced Movie List Styles */
+.page-header {
+    text-align: center;
+    padding: 3rem 0;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+    border-radius: 2rem;
+    margin-bottom: 2rem;
+}
+
+.filters-card {
+    background: white;
+    border-radius: 1.5rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.filters-card .card-header {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+    border-bottom: none;
+    padding: 1.5rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.filters-card .card-header h5 {
+    margin: 0;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.filter-form {
+    padding: 0;
+}
+
+.search-input-group {
+    position: relative;
+}
+
+.search-input-group .search-icon {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    z-index: 3;
+}
+
+.search-input-group .search-input {
+    padding-left: 2.5rem;
+}
+
+.results-summary {
+    background: rgba(248, 250, 252, 0.8);
+    border-radius: 1rem;
+    padding: 1.5rem 2rem;
+    border-left: 4px solid var(--primary-color);
+}
+
+.results-count {
+    font-weight: 700;
+    color: var(--primary-color);
+    font-size: 1.1rem;
+}
+
+.active-filters {
+    margin-top: 0.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.filter-tag {
+    background: var(--primary-gradient);
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 50px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.btn-close-filter {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1rem;
+    line-height: 1;
+    margin-left: 0.25rem;
+    cursor: pointer;
+    opacity: 0.8;
+}
+
+.btn-close-filter:hover {
+    opacity: 1;
+}
+
+.view-options .btn-group .btn {
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.5rem;
+}
+
+.view-options .btn.active {
+    background: var(--primary-gradient);
+    border-color: transparent;
+    color: white;
+}
+
+.no-results {
+    background: white;
+    border-radius: 1.5rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    margin: 2rem 0;
+}
+
+.no-results-icon {
+    width: 100px;
+    height: 100px;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    font-size: 3rem;
+    color: var(--primary-color);
+}
+
+.pagination-nav {
+    margin-top: 3rem;
+}
+
+.pagination .page-link {
+    border: none;
+    border-radius: 0.75rem;
+    margin: 0 0.25rem;
+    padding: 0.75rem 1rem;
+    color: var(--text-primary);
+    background: white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.pagination .page-link:hover {
+    background: var(--primary-gradient);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.pagination .page-item.active .page-link {
+    background: var(--primary-gradient);
+    color: white;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    transform: translateY(-2px);
+}
+
+/* List View Styles */
+.movies-list-view .movie-grid-item {
+    flex: 0 0 100%;
+    max-width: 100%;
+}
+
+.movies-list-view .movie-card {
+    display: flex;
+    height: 200px;
+}
+
+.movies-list-view .movie-card .card {
+    flex-direction: row;
+    width: 100%;
+}
+
+.movies-list-view .movie-poster-container {
+    flex: 0 0 150px;
+    border-radius: 1rem 0 0 1rem;
+}
+
+.movies-list-view .movie-poster {
+    height: 100%;
+}
+
+.movies-list-view .card-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .page-header {
+        padding: 2rem 1rem;
+    }
+    
+    .filters-card .card-header {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: stretch;
+    }
+    
+    .results-summary {
+        padding: 1rem 1.5rem;
+    }
+    
+    .active-filters {
+        justify-content: center;
+    }
+    
+    .view-options {
+        margin-top: 1rem;
+        text-align: center;
+    }
+}
+
+@media (max-width: 576px) {
+    .filter-form .row > div {
+        margin-bottom: 1rem;
+    }
+    
+    .no-results-icon {
+        width: 80px;
+        height: 80px;
+        font-size: 2rem;
+    }
+    
+    .pagination .page-link {
+        padding: 0.5rem 0.75rem;
+        margin: 0 0.125rem;
+    }
+}
+</style>
+{% endblock %}
                         <!-- Recherche -->
                         <div class="col-md-4">
                             <label class="form-label font-semibold">Recherche</label>

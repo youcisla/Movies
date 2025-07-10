@@ -3,79 +3,305 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Movie Recommender{% endblock %}</title>
+    <meta name="description" content="MovieRec - Système de recommandation de films personnalisé avec IA">
+    <meta name="keywords" content="films, recommandations, cinéma, IA, machine learning">
+    <meta name="author" content="MovieRec">
+    <meta name="theme-color" content="#667eea">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="{% block og_title %}MovieRec - Recommandations de films personnalisées{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}Découvrez vos prochains films préférés grâce à notre système de recommandation intelligent{% endblock %}">
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:title" content="{% block twitter_title %}MovieRec - Recommandations de films{% endblock %}">
+    <meta property="twitter:description" content="{% block twitter_description %}Système de recommandation de films personnalisé{% endblock %}">
+    
+    <title>{% block title %}MovieRec - Recommandations de films personnalisées{% endblock %}</title>
+    
     {% load static %}
-    <!-- Bootstrap & Tailwind CSS -->
+    
+    <!-- Preload critical resources -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    
+    <!-- Enhanced Typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Orbitron:wght@400;500;700;900&display=swap" rel="stylesheet">
+    
+    <!-- CSS Framework -->
     <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
     <link href="{% static 'css/tailwind.min.css' %}" rel="stylesheet">
-    <!-- Google Fonts: Inter -->
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
-    <style>
-      body { font-family: 'Orbitron', Arial, sans-serif; background: linear-gradient(135deg, #181c2f 0%, #2b2e4a 100%) !important; }
-      .neon-card {
-        background: rgba(24,28,47,0.85);
-        box-shadow: 0 0 24px 0 #7f5af0, 0 2px 32px 0 #2ec4b6;
-        border-radius: 1.5rem;
-        border: 1px solid rgba(127,90,240,0.18);
-        transition: box-shadow 0.3s, transform 0.3s;
-      }
-      .neon-card:hover {
-        box-shadow: 0 0 32px 4px #2ec4b6, 0 4px 48px 0 #7f5af0;
-        transform: translateY(-6px) scale(1.03);
-      }
-      .navbar-neon {
-        background: rgba(24,28,47,0.95)!important;
-        box-shadow: 0 4px 24px 0 #7f5af0;
-        border-bottom: 2px solid #2ec4b6;
-      }
-      .btn-neon {
-        border-radius: 9999px!important;
-        font-weight: 700;
-        letter-spacing: 0.04em;
-        background: linear-gradient(90deg,#7f5af0,#2ec4b6);
-        color: #fff;
-        border: none;
-        box-shadow: 0 0 8px #7f5af0;
-        transition: background 0.3s, box-shadow 0.3s;
-      }
-      .btn-neon:hover {
-        background: linear-gradient(90deg,#2ec4b6,#7f5af0);
-        box-shadow: 0 0 16px #2ec4b6;
-        color: #fff;
-      }
-    </style>
-    <!-- Font Awesome -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome with optimization -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" crossorigin="anonymous">
+    
     <!-- Custom Styles -->
     <link href="{% static 'css/style.css' %}" rel="stylesheet">
+    
+    <!-- Enhanced Meta Styling -->
+    <style>
+        :root {
+            font-synthesis: none;
+            text-rendering: optimizeLegibility;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            -webkit-text-size-adjust: 100%;
+        }
+        
+        body { 
+            font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #cbd5e0 100%) !important;
+            min-height: 100vh;
+            scroll-behavior: smooth;
+        }
+        
+        .orbitron {
+            font-family: 'Orbitron', monospace;
+        }
+        
+        /* Enhanced glassmorphism navbar */
+        .navbar-glass {
+            background: rgba(248, 250, 252, 0.85) !important;
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 
+                0 8px 32px rgba(31, 38, 135, 0.15),
+                0 0 0 1px rgba(255, 255, 255, 0.05);
+        }
+        
+        /* Enhanced neon cards */
+        .neon-card {
+            background: rgba(24, 28, 47, 0.95);
+            backdrop-filter: blur(20px);
+            box-shadow: 
+                0 0 20px rgba(102, 126, 234, 0.4),
+                0 0 40px rgba(118, 75, 162, 0.2),
+                0 8px 32px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            border-radius: 1.5rem;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .neon-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(102, 126, 234, 0.1),
+                transparent
+            );
+            transition: left 0.5s;
+        }
+        
+        .neon-card:hover::before {
+            left: 100%;
+        }
+        
+        .neon-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 
+                0 0 30px rgba(102, 126, 234, 0.6),
+                0 0 60px rgba(118, 75, 162, 0.4),
+                0 20px 40px rgba(0, 0, 0, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+        
+        /* Enhanced buttons */
+        .btn-neon {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 50px;
+            color: white;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            font-size: 0.875rem;
+            padding: 0.75rem 2rem;
+            box-shadow: 
+                0 0 20px rgba(102, 126, 234, 0.5),
+                0 4px 15px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-neon::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255, 255, 255, 0.3),
+                transparent
+            );
+            transition: left 0.5s;
+        }
+        
+        .btn-neon:hover {
+            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 
+                0 0 30px rgba(102, 126, 234, 0.7),
+                0 10px 25px rgba(0, 0, 0, 0.3);
+            color: white;
+        }
+        
+        .btn-neon:hover::before {
+            left: 100%;
+        }
+        
+        /* Improved loading states */
+        .page-loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease-out;
+        }
+        
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(102, 126, 234, 0.1);
+            border-left: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        /* Enhanced Search Styling */
+        .search-container {
+            position: relative;
+            max-width: 400px;
+        }
+        
+        .search-form {
+            position: relative;
+        }
+        
+        .search-input {
+            padding-left: 2.5rem;
+            padding-right: 1rem;
+            border-radius: 50px;
+            border: 2px solid rgba(102, 126, 234, 0.1);
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+        
+        .search-input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+            background: white;
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #a0aec0;
+            z-index: 3;
+            transition: color 0.3s ease;
+        }
+        
+        .search-input:focus + .search-icon {
+            color: #667eea;
+        }
+        
+        .search-suggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border-radius: 1rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            z-index: 1000;
+            display: none;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .search-suggestions.show {
+            display: block;
+        }
+        
+        .suggestion-item {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid #f1f5f9;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .suggestion-item:hover {
+            background: #f8fafc;
+            padding-left: 1.5rem;
+        }
+        
+        .suggestion-item:last-child {
+            border-bottom: none;
+        }
+    </style>
+    
+    {% block extra_css %}{% endblock %}
 </head>
-<body class="min-vh-100 flex flex-col" style="background: linear-gradient(135deg, #181c2f 0%, #2b2e4a 100%) !important;">
-    <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark navbar-neon fixed-top py-3">
+<body class="min-vh-100 d-flex flex-column" style="background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #cbd5e0 100%) !important;">
+    <!-- Page Loading Indicator -->
+    <div id="pageLoading" class="page-loading" style="display: none;">
+        <div class="text-center">
+            <div class="loading-spinner"></div>
+            <p class="mt-3 text-muted">Chargement...</p>
+        </div>
+    </div>
+
+    <!-- Enhanced Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light navbar-glass fixed-top py-3">
         <div class="container">
-            <a class="navbar-brand flex items-center gap-2 text-2xl font-bold tracking-tight" href="{% url 'movies:home' %}">
-                <i class="fas fa-film" style="color:#7f5af0;"></i>
-                <span style="color:#2ec4b6;">MovieRec</span>
+            <a class="navbar-brand orbitron fw-bold text-gradient" href="{% url 'movies:home' %}">
+                <i class="fas fa-film me-2"></i>MovieRec
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
+            
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a class="nav-link flex items-center gap-1" href="{% url 'movies:home' %}">
-                            <i class="fas fa-home"></i>Accueil
+                        <a class="nav-link" href="{% url 'movies:home' %}">
+                            <i class="fas fa-home me-1"></i>Accueil
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link flex items-center gap-1" href="{% url 'movies:movie_list' %}">
-                            <i class="fas fa-list"></i>Films
+                        <a class="nav-link" href="{% url 'movies:movie_list' %}">
+                            <i class="fas fa-film me-1"></i>Films
                         </a>
                     </li>
                     {% if user.is_authenticated %}
                     <li class="nav-item">
-                        <a class="nav-link flex items-center gap-1" href="{% url 'movies:recommendations' %}">
-                            <i class="fas fa-star"></i>Recommandations
+                        <a class="nav-link" href="{% url 'movies:recommendations' %}">
+                            <i class="fas fa-star me-1"></i>Recommandations
                         </a>
                     </li>
                     <li class="nav-item">
@@ -83,34 +309,39 @@
                             <i class="fas fa-chart-line me-1"></i>Dashboard
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'movies:watchlist' %}">
-                            <i class="fas fa-bookmark me-1"></i>Ma Liste
-                        </a>
-                    </li>
                     {% endif %}
                 </ul>
                 
-                <!-- Barre de recherche -->
-                <form class="d-flex me-3" method="get" action="{% url 'movies:search' %}">
-                    <div class="input-group">
-                        <input class="form-control" type="search" name="q" placeholder="Rechercher un film..." value="{{ request.GET.q }}">
-                        <button class="btn btn-outline-light" type="submit">
-                            <i class="fas fa-search"></i>
-                        </button>
-                    </div>
-                </form>
+                <!-- Enhanced Search Bar -->
+                <div class="search-container me-3">
+                    <form method="get" action="{% url 'movies:search' %}" class="search-form">
+                        <div class="position-relative">
+                            <i class="fas fa-search search-icon"></i>
+                            <input type="text" name="q" placeholder="Rechercher des films..." 
+                                   class="form-control search-input"
+                                   value="{{ request.GET.q }}"
+                                   autocomplete="off">
+                            <div class="search-suggestions" id="searchSuggestions"></div>
+                        </div>
+                    </form>
+                </div>
+                            <input class="form-control" type="search" name="q" placeholder="Rechercher un film..." value="{{ request.GET.q }}">
+                        </div>
+                    </form>
+                </div>
                 
-                <!-- Menu utilisateur -->
                 <ul class="navbar-nav">
                     {% if user.is_authenticated %}
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
-                            <i class="fas fa-user me-1"></i>{{ user.username }}
+                            <i class="fas fa-user-circle me-1"></i>{{ user.username }}
                         </a>
                         <ul class="dropdown-menu">
                             <li><a class="dropdown-item" href="{% url 'movies:profile' %}">
-                                <i class="fas fa-user-circle me-2"></i>Mon Profil
+                                <i class="fas fa-user me-2"></i>Mon Profil
+                            </a></li>
+                            <li><a class="dropdown-item" href="{% url 'movies:watchlist' %}">
+                                <i class="fas fa-bookmark me-2"></i>Ma Liste
                             </a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item" href="{% url 'movies:logout' %}">
@@ -125,7 +356,7 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'movies:register' %}">
+                        <a class="btn btn-neon ms-2" href="{% url 'movies:register' %}">
                             <i class="fas fa-user-plus me-1"></i>Inscription
                         </a>
                     </li>
@@ -134,58 +365,178 @@
             </div>
         </div>
     </nav>
+                
+                <!-- Menu utilisateur déjà inclus dans la nouvelle navigation -->
+            </div>
+        </div>
+    </nav>
 
-    <!-- Messages -->
+    <!-- Enhanced Messages with Toast Style -->
     {% if messages %}
-    <div class="container mt-3">
+    <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1055; margin-top: 80px;">
         {% for message in messages %}
-        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        <div class="toast show" role="alert" data-bs-autohide="true" data-bs-delay="5000">
+            <div class="toast-header">
+                <i class="fas fa-{% if message.tags == 'success' %}check-circle text-success{% elif message.tags == 'error' or message.tags == 'danger' %}exclamation-triangle text-danger{% elif message.tags == 'warning' %}exclamation-circle text-warning{% else %}info-circle text-info{% endif %} me-2"></i>
+                <strong class="me-auto">Notification</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+            </div>
+            <div class="toast-body">
+                {{ message }}
+            </div>
         </div>
         {% endfor %}
     </div>
     {% endif %}
 
-    <!-- Contenu principal -->
-    <main class="container py-5 flex-grow" style="margin-top: 90px;">
+    <!-- Enhanced Main Content -->
+    <main class="container-fluid py-5 flex-grow-1" style="margin-top: 100px; max-width: 1400px;">
         {% block content %}
-        <h1>Welcome to MovieRec</h1>
-        <p>Your personalized movie recommendation system.</p>
+        <div class="text-center py-5">
+            <div class="animate-fade-in">
+                <h1 class="display-4 fw-bold text-gradient mb-4">Bienvenue sur MovieRec</h1>
+                <p class="lead text-muted">Votre système de recommandation de films personnalisé</p>
+                <div class="mt-4">
+                    <a href="{% url 'movies:movie_list' %}" class="btn btn-neon me-3">
+                        <i class="fas fa-film me-2"></i>Découvrir des films
+                    </a>
+                    {% if not user.is_authenticated %}
+                    <a href="{% url 'movies:register' %}" class="btn btn-outline-primary">
+                        <i class="fas fa-user-plus me-2"></i>Créer un compte
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
         {% endblock %}
     </main>
 
-    <!-- Footer -->
-    <footer class="bg-gradient-to-r from-gray-900 to-gray-700 text-light py-4 mt-5 shadow-inner">
+    <!-- Enhanced Footer -->
+    <footer class="mt-auto py-4 position-relative overflow-hidden">
         <div class="container">
-            <div class="row">
-                <div class="col-md-6 mb-3 mb-md-0">
-                    <h5 class="flex items-center gap-2"><i class="fas fa-film text-yellow-400"></i><span class="text-white">MovieRec</span></h5>
-                    <p class="text-gray-300">Système de recommandation de films personnalisé</p>
-                </div>
+            <div class="row align-items-center">
                 <div class="col-md-6">
-                    <h6 class="text-white">Liens utiles</h6>
-                    <ul class="list-unstyled">
-                        <li><a href="{% url 'movies:home' %}" class="text-light hover:text-yellow-400 transition">Accueil</a></li>
-                        <li><a href="{% url 'movies:movie_list' %}" class="text-light hover:text-yellow-400 transition">Films</a></li>
-                        {% if user.is_authenticated %}
-                        <li><a href="{% url 'movies:recommendations' %}" class="text-light hover:text-yellow-400 transition">Recommandations</a></li>
-                        {% endif %}
-                    </ul>
+                    <div class="d-flex align-items-center mb-3 mb-md-0">
+                        <i class="fas fa-film text-gradient me-2" style="font-size: 1.5rem;"></i>
+                        <span class="fw-bold text-gradient">MovieRec</span>
+                    </div>
+                    <p class="text-muted small mb-0">
+                        Recommandations de films alimentées par l'IA
+                    </p>
                 </div>
-            </div>
-            <hr class="border-gray-700">
-            <div class="row">
-                <div class="col-12 text-center">
-                    <p class="text-gray-400">&copy; 2024 MovieRec. Tous droits réservés.</p>
+                <div class="col-md-6 text-md-end">
+                    <div class="social-links mb-2">
+                        <a href="#" class="text-muted me-3 hover-lift">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="text-muted me-3 hover-lift">
+                            <i class="fab fa-facebook"></i>
+                        </a>
+                        <a href="#" class="text-muted hover-lift">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                    </div>
+                    <p class="text-muted small mb-0">
+                        © 2024 MovieRec. Tous droits réservés.
+                    </p>
                 </div>
             </div>
         </div>
     </footer>
 
-    <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Back to Top Button -->
+    <button id="backToTop" class="btn btn-fab" style="display: none;" title="Retour en haut">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <!-- Toast Container for JavaScript notifications -->
+    <div id="toast-container" class="position-fixed top-0 end-0 p-3" style="z-index: 1055; margin-top: 80px;"></div>
+
+    <!-- Enhanced Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{% static 'js/main.js' %}"></script>
+    
+    <!-- Enhanced JavaScript -->
+    <script>
+        // Page loading animation
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize tooltips
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+            
+            // Initialize popovers
+            var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
+            var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
+                return new bootstrap.Popover(popoverTriggerEl);
+            });
+            
+            // Back to top button
+            const backToTop = document.getElementById('backToTop');
+            if (backToTop) {
+                window.addEventListener('scroll', function() {
+                    if (window.pageYOffset > 300) {
+                        backToTop.style.display = 'flex';
+                    } else {
+                        backToTop.style.display = 'none';
+                    }
+                });
+                
+                backToTop.addEventListener('click', function() {
+                    window.scrollTo({
+                        top: 0,
+                        behavior: 'smooth'
+                    });
+                });
+            }
+            
+            // Add animation classes to elements on scroll
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+            
+            const observer = new IntersectionObserver(function(entries) {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('animate-slide-up');
+                    }
+                });
+            }, observerOptions);
+            
+            // Observe cards for animation
+            document.querySelectorAll('.card, .movie-card').forEach(card => {
+                observer.observe(card);
+            });
+            
+            // Auto-dismiss toasts
+            document.querySelectorAll('.toast').forEach(toast => {
+                const bsToast = new bootstrap.Toast(toast);
+                setTimeout(() => {
+                    bsToast.hide();
+                }, 5000);
+            });
+        });
+        
+        // Enhanced search functionality
+        const searchForm = document.querySelector('form[action*="search"]');
+        if (searchForm) {
+            const searchInput = searchForm.querySelector('input[name="q"]');
+            if (searchInput) {
+                searchInput.addEventListener('focus', function() {
+                    this.parentElement.classList.add('search-focused');
+                });
+                
+                searchInput.addEventListener('blur', function() {
+                    this.parentElement.classList.remove('search-focused');
+                });
+            }
+        }
+    </script>
+    
+    <!-- Enhanced UI/UX JavaScript -->
+    <script src="{% static 'js/ui-enhancements.js' %}"></script>
     
     {% block scripts %}
     {% endblock %}
