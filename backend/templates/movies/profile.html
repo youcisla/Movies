@@ -6,40 +6,40 @@
 <div class="container mt-4">
     <div class="row">
         <div class="col-md-8">
-            <h1 class="mb-4">
-                <i class="fas fa-user-circle me-2"></i>Mon Profil
+            <h1 class="mb-4 text-3xl font-bold flex items-center gap-2">
+                <i class="fas fa-user-circle text-indigo-500"></i>Mon Profil
             </h1>
             
             <!-- User Statistics -->
             <div class="row mb-4">
                 <div class="col-md-3">
-                    <div class="card text-center">
+                    <div class="card text-center shadow bg-gradient-to-br from-white to-gray-100">
                         <div class="card-body">
-                            <h3 class="text-primary">{{ stats.total_reviews }}</h3>
+                            <h3 class="text-indigo-500 font-bold">{{ stats.total_reviews }}</h3>
                             <small class="text-muted">Avis donnés</small>
                         </div>
                     </div>
                 </div>
                 <div class="col-md-3">
-                    <div class="card text-center">
+                    <div class="card text-center shadow bg-gradient-to-br from-white to-gray-100">
                         <div class="card-body">
-                            <h3 class="text-success">{{ stats.total_watchlist }}</h3>
+                            <h3 class="text-green-500 font-bold">{{ stats.total_watchlist }}</h3>
                             <small class="text-muted">Films à voir</small>
                         </div>
                     </div>
                 </div>
                 <div class="col-md-3">
-                    <div class="card text-center">
+                    <div class="card text-center shadow bg-gradient-to-br from-white to-gray-100">
                         <div class="card-body">
-                            <h3 class="text-warning">{{ stats.average_rating|floatformat:1 }}</h3>
+                            <h3 class="text-yellow-400 font-bold">{{ stats.average_rating|floatformat:1 }}</h3>
                             <small class="text-muted">Note moyenne</small>
                         </div>
                     </div>
                 </div>
                 <div class="col-md-3">
-                    <div class="card text-center">
+                    <div class="card text-center shadow bg-gradient-to-br from-white to-gray-100">
                         <div class="card-body">
-                            <h3 class="text-info">{{ stats.favorite_genres|length }}</h3>
+                            <h3 class="text-blue-400 font-bold">{{ stats.favorite_genres|length }}</h3>
                             <small class="text-muted">Genres préférés</small>
                         </div>
                     </div>
@@ -47,9 +47,9 @@
             </div>
             
             <!-- Recent Reviews -->
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h5><i class="fas fa-star me-2"></i>Mes derniers avis</h5>
+            <div class="card mb-4 shadow bg-gradient-to-br from-white to-gray-100">
+                <div class="card-header bg-gradient-to-r from-indigo-100 to-blue-100 border-0">
+                    <h5 class="font-bold"><i class="fas fa-star me-2 text-yellow-400"></i>Mes derniers avis</h5>
                 </div>
                 <div class="card-body">
                     {% if user_reviews %}
@@ -82,9 +82,9 @@
         
         <div class="col-md-4">
             <!-- Favorite Genres -->
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h5><i class="fas fa-heart me-2"></i>Mes genres préférés</h5>
+            <div class="card mb-4 shadow bg-gradient-to-br from-white to-gray-100">
+                <div class="card-header bg-gradient-to-r from-pink-100 to-yellow-100 border-0">
+                    <h5 class="font-bold"><i class="fas fa-heart me-2 text-pink-400"></i>Mes genres préférés</h5>
                 </div>
                 <div class="card-body">
                     {% if stats.favorite_genres %}
@@ -101,9 +101,9 @@
             </div>
             
             <!-- Watchlist Preview -->
-            <div class="card">
-                <div class="card-header">
-                    <h5><i class="fas fa-bookmark me-2"></i>Ma liste à voir</h5>
+            <div class="card shadow bg-gradient-to-br from-white to-gray-100">
+                <div class="card-header bg-gradient-to-r from-indigo-100 to-blue-100 border-0">
+                    <h5 class="font-bold"><i class="fas fa-bookmark me-2 text-indigo-500"></i>Ma liste à voir</h5>
                 </div>
                 <div class="card-body">
                     {% if user_watchlist %}

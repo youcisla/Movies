@@ -22,12 +22,12 @@
     <div class="row">
         <!-- Poster -->
         <div class="col-md-4 mb-4">
-            <div class="card border-0 shadow-sm">
+            <div class="card border-0 shadow-lg bg-gradient-to-br from-white to-gray-100">
                 {% if movie.poster_url %}
-                <img src="{{ movie.poster_url }}" class="card-img-top" alt="{{ movie.title }}" style="height: 600px; object-fit: cover;">
+                <img src="{{ movie.poster_url }}" class="card-img-top rounded-t-lg" alt="{{ movie.title }}" style="height: 600px; object-fit: cover;">
                 {% else %}
-                <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 600px;">
-                    <i class="fas fa-film text-muted" style="font-size: 5rem;"></i>
+                <div class="card-img-top bg-gradient-to-br from-gray-200 to-gray-400 d-flex align-items-center justify-content-center rounded-t-lg" style="height: 600px;">
+                    <i class="fas fa-film text-gray-400" style="font-size: 5rem;"></i>
                 </div>
                 {% endif %}
             </div>
@@ -35,9 +35,9 @@
 
         <!-- Informations principales -->
         <div class="col-md-8">
-            <div class="card border-0 shadow-sm">
+            <div class="card border-0 shadow-lg bg-gradient-to-br from-white to-gray-100">
                 <div class="card-body">
-                    <h1 class="card-title">{{ movie.title }}</h1>
+                    <h1 class="card-title font-bold text-3xl mb-2">{{ movie.title }}</h1>
                     
                     {% if movie.original_title != movie.title %}
                     <p class="text-muted">Titre original : {{ movie.original_title }}</p>

@@ -16,19 +16,19 @@
     <!-- Filtres de type de recommandation -->
     <div class="row mb-4">
         <div class="col-12">
-            <div class="card border-0 shadow-sm">
+            <div class="card border-0 shadow-lg bg-gradient-to-r from-gray-100 to-gray-200">
                 <div class="card-body">
                     <div class="btn-group" role="group">
-                        <a href="?type=hybrid" class="btn {% if recommendation_type == 'hybrid' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+                        <a href="?type=hybrid" class="btn {% if recommendation_type == 'hybrid' %}btn-primary shadow{% else %}btn-outline-primary{% endif %}">
                             <i class="fas fa-magic me-1"></i>Recommandations mixtes
                         </a>
-                        <a href="?type=content" class="btn {% if recommendation_type == 'content' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+                        <a href="?type=content" class="btn {% if recommendation_type == 'content' %}btn-primary shadow{% else %}btn-outline-primary{% endif %}">
                             <i class="fas fa-tags me-1"></i>Basées sur le contenu
                         </a>
-                        <a href="?type=collaborative" class="btn {% if recommendation_type == 'collaborative' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+                        <a href="?type=collaborative" class="btn {% if recommendation_type == 'collaborative' %}btn-primary shadow{% else %}btn-outline-primary{% endif %}">
                             <i class="fas fa-users me-1"></i>Collaboratives
                         </a>
-                        <a href="?type=trending" class="btn {% if recommendation_type == 'trending' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+                        <a href="?type=trending" class="btn {% if recommendation_type == 'trending' %}btn-primary shadow{% else %}btn-outline-primary{% endif %}">
                             <i class="fas fa-fire me-1"></i>Tendances
                         </a>
                     </div>
@@ -40,8 +40,8 @@
     <!-- Explication du type de recommandation -->
     <div class="row mb-4">
         <div class="col-12">
-            <div class="alert alert-info" role="alert">
-                <i class="fas fa-info-circle me-2"></i>
+            <div class="alert alert-info bg-gradient-to-r from-indigo-100 to-blue-100 border-0 shadow">
+                <i class="fas fa-info-circle me-2 text-indigo-600"></i>
                 {% if recommendation_type == 'hybrid' %}
                     <strong>Recommandations mixtes :</strong> Combinaison de plusieurs algorithmes pour des suggestions optimales.
                 {% elif recommendation_type == 'content' %}
@@ -63,12 +63,12 @@
         </div>
         {% empty %}
         <div class="col-12">
-            <div class="card border-0 shadow-sm">
+            <div class="card border-0 shadow-lg bg-gradient-to-br from-white to-gray-100">
                 <div class="card-body text-center py-5">
-                    <i class="fas fa-magic text-muted mb-3" style="font-size: 3rem;"></i>
-                    <h5>Pas encore de recommandations</h5>
+                    <i class="fas fa-magic text-indigo-200 mb-3" style="font-size: 3rem;"></i>
+                    <h5 class="font-bold">Pas encore de recommandations</h5>
                     <p class="text-muted">Notez quelques films pour obtenir des recommandations personnalisées</p>
-                    <a href="{% url 'movies:movie_list' %}" class="btn btn-primary">
+                    <a href="{% url 'movies:movie_list' %}" class="btn btn-primary shadow">
                         <i class="fas fa-search me-2"></i>Découvrir des films
                     </a>
                 </div>
@@ -121,25 +121,25 @@
     <!-- Conseils pour améliorer les recommandations -->
     <div class="row mt-5">
         <div class="col-12">
-            <div class="card border-0 bg-light">
+            <div class="card border-0 shadow-lg bg-gradient-to-r from-yellow-50 to-indigo-50">
                 <div class="card-body">
-                    <h5><i class="fas fa-lightbulb text-warning me-2"></i>Conseils pour de meilleures recommandations</h5>
+                    <h5 class="font-bold"><i class="fas fa-lightbulb text-yellow-400 me-2"></i>Conseils pour de meilleures recommandations</h5>
                     <div class="row">
                         <div class="col-md-4">
                             <div class="d-flex align-items-center mb-2">
-                                <i class="fas fa-star text-warning me-2"></i>
+                                <i class="fas fa-star text-yellow-400 me-2"></i>
                                 <span>Notez plus de films</span>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="d-flex align-items-center mb-2">
-                                <i class="fas fa-bookmark text-primary me-2"></i>
+                                <i class="fas fa-bookmark text-indigo-500 me-2"></i>
                                 <span>Ajoutez des films à votre liste</span>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="d-flex align-items-center mb-2">
-                                <i class="fas fa-comments text-info me-2"></i>
+                                <i class="fas fa-comments text-blue-400 me-2"></i>
                                 <span>Laissez des commentaires détaillés</span>
                             </div>
                         </div>

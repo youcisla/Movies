@@ -5,39 +5,77 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Movie Recommender{% endblock %}</title>
     {% load static %}
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap & Tailwind CSS -->
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'css/tailwind.min.css' %}" rel="stylesheet">
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+      body { font-family: 'Orbitron', Arial, sans-serif; background: linear-gradient(135deg, #181c2f 0%, #2b2e4a 100%) !important; }
+      .neon-card {
+        background: rgba(24,28,47,0.85);
+        box-shadow: 0 0 24px 0 #7f5af0, 0 2px 32px 0 #2ec4b6;
+        border-radius: 1.5rem;
+        border: 1px solid rgba(127,90,240,0.18);
+        transition: box-shadow 0.3s, transform 0.3s;
+      }
+      .neon-card:hover {
+        box-shadow: 0 0 32px 4px #2ec4b6, 0 4px 48px 0 #7f5af0;
+        transform: translateY(-6px) scale(1.03);
+      }
+      .navbar-neon {
+        background: rgba(24,28,47,0.95)!important;
+        box-shadow: 0 4px 24px 0 #7f5af0;
+        border-bottom: 2px solid #2ec4b6;
+      }
+      .btn-neon {
+        border-radius: 9999px!important;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        background: linear-gradient(90deg,#7f5af0,#2ec4b6);
+        color: #fff;
+        border: none;
+        box-shadow: 0 0 8px #7f5af0;
+        transition: background 0.3s, box-shadow 0.3s;
+      }
+      .btn-neon:hover {
+        background: linear-gradient(90deg,#2ec4b6,#7f5af0);
+        box-shadow: 0 0 16px #2ec4b6;
+        color: #fff;
+      }
+    </style>
+    <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Custom Styles -->
     <link href="{% static 'css/style.css' %}" rel="stylesheet">
 </head>
-<body>
+<body class="min-vh-100 flex flex-col" style="background: linear-gradient(135deg, #181c2f 0%, #2b2e4a 100%) !important;">
     <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <nav class="navbar navbar-expand-lg navbar-dark navbar-neon fixed-top py-3">
         <div class="container">
-            <a class="navbar-brand" href="{% url 'movies:home' %}">
-                <i class="fas fa-film me-2"></i>
-                MovieRec
+            <a class="navbar-brand flex items-center gap-2 text-2xl font-bold tracking-tight" href="{% url 'movies:home' %}">
+                <i class="fas fa-film" style="color:#7f5af0;"></i>
+                <span style="color:#2ec4b6;">MovieRec</span>
             </a>
-            
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'movies:home' %}">
-                            <i class="fas fa-home me-1"></i>Accueil
+                        <a class="nav-link flex items-center gap-1" href="{% url 'movies:home' %}">
+                            <i class="fas fa-home"></i>Accueil
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'movies:movie_list' %}">
-                            <i class="fas fa-list me-1"></i>Films
+                        <a class="nav-link flex items-center gap-1" href="{% url 'movies:movie_list' %}">
+                            <i class="fas fa-list"></i>Films
                         </a>
                     </li>
                     {% if user.is_authenticated %}
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'movies:recommendations' %}">
-                            <i class="fas fa-star me-1"></i>Recommandations
+                        <a class="nav-link flex items-center gap-1" href="{% url 'movies:recommendations' %}">
+                            <i class="fas fa-star"></i>Recommandations
                         </a>
                     </li>
                     <li class="nav-item">
@@ -105,34 +143,34 @@
     {% endif %}
 
     <!-- Contenu principal -->
-    <main class="container-fluid py-4">
+    <main class="container py-5 flex-grow" style="margin-top: 90px;">
         {% block content %}
         {% endblock %}
     </main>
 
     <!-- Footer -->
-    <footer class="bg-dark text-light py-4 mt-5">
+    <footer class="bg-gradient-to-r from-gray-900 to-gray-700 text-light py-4 mt-5 shadow-inner">
         <div class="container">
             <div class="row">
-                <div class="col-md-6">
-                    <h5><i class="fas fa-film me-2"></i>MovieRec</h5>
-                    <p>Système de recommandation de films personnalisé</p>
+                <div class="col-md-6 mb-3 mb-md-0">
+                    <h5 class="flex items-center gap-2"><i class="fas fa-film text-yellow-400"></i><span class="text-white">MovieRec</span></h5>
+                    <p class="text-gray-300">Système de recommandation de films personnalisé</p>
                 </div>
                 <div class="col-md-6">
-                    <h6>Liens utiles</h6>
+                    <h6 class="text-white">Liens utiles</h6>
                     <ul class="list-unstyled">
-                        <li><a href="{% url 'movies:home' %}" class="text-light">Accueil</a></li>
-                        <li><a href="{% url 'movies:movie_list' %}" class="text-light">Films</a></li>
+                        <li><a href="{% url 'movies:home' %}" class="text-light hover:text-yellow-400 transition">Accueil</a></li>
+                        <li><a href="{% url 'movies:movie_list' %}" class="text-light hover:text-yellow-400 transition">Films</a></li>
                         {% if user.is_authenticated %}
-                        <li><a href="{% url 'movies:recommendations' %}" class="text-light">Recommandations</a></li>
+                        <li><a href="{% url 'movies:recommendations' %}" class="text-light hover:text-yellow-400 transition">Recommandations</a></li>
                         {% endif %}
                     </ul>
                 </div>
             </div>
-            <hr>
+            <hr class="border-gray-700">
             <div class="row">
                 <div class="col-12 text-center">
-                    <p>&copy; 2024 MovieRec. Tous droits réservés.</p>
+                    <p class="text-gray-400">&copy; 2024 MovieRec. Tous droits réservés.</p>
                 </div>
             </div>
         </div>
