@@ -67,6 +67,7 @@ INSTALLED_APPS = [
     "recommendations",
     "analytics",
     "accounts",
+    "dashboard_queries",
 ]
 
 MIDDLEWARE = [

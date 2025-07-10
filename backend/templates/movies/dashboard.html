@@ -13,244 +13,49 @@
         </div>
     </div>
 
-    <!-- Interactive Q&A Section -->
+    <!-- New Recommendations and Statistics Section -->
     <div class="row mb-5">
         <div class="col-12">
             <div class="card border-0 shadow-lg">
                 <div class="card-header bg-gradient-primary text-white">
-                    <h4><i class="fas fa-robot me-2"></i>Assistant Recommandations IA</h4>
-                    <p class="mb-0">Posez des questions sur nos recommandations et découvrez comment ça marche !</p>
-                </div>
-                <div class="card-body">
-                    <!-- Question Input -->
-                    <div class="row mb-4">
-                        <div class="col-md-10">
-                            <div class="input-group">
-                                <input type="text" class="form-control form-control-lg" 
-                                       id="questionInput" 
-                                       placeholder="Ex: J'ai regardé un film d'action, qu'est-ce que votre site va me recommander ?"
-                                       value="">
-                                <button class="btn btn-primary btn-lg" type="button" id="askQuestion">
-                                    <i class="fas fa-paper-plane me-1"></i>Demander
-                                </button>
-                            </div>
-                        </div>
-                        <div class="col-md-2">
-                            <button class="btn btn-outline-secondary btn-lg w-100" id="clearQuestion">
-                                <i class="fas fa-eraser"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Suggested Questions -->
-                    <div class="row mb-4">
-                        <div class="col-12">
-                            <h6>Questions suggérées :</h6>
-                            <div class="d-flex flex-wrap gap-2">
-                                <button class="btn btn-outline-primary btn-sm suggested-question" 
-                                        data-question="J'ai regardé un film d'action, qu'est-ce que votre site va me recommander ?">
-                                    Film d'action → Recommandations
-                                </button>
-                                <button class="btn btn-outline-success btn-sm suggested-question" 
-                                        data-question="Si j'aime les comédies romantiques, que va recommander l'algorithme ?">
-                                    Comédies romantiques
-                                </button>
-                                <button class="btn btn-outline-info btn-sm suggested-question" 
-                                        data-question="Comment le système apprend mes goûts ?">
-                                    Apprentissage IA
-                                </button>
-                                <button class="btn btn-outline-warning btn-sm suggested-question" 
-                                        data-question="Quels facteurs influence les recommandations ?">
-                                    Facteurs d'influence
-                                </button>
-                                <button class="btn btn-outline-dark btn-sm suggested-question" 
-                                        data-question="Pourquoi Neo4j et MongoDB ensemble ?">
-                                    Architecture technique
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Answer Section -->
-                    <div id="answerSection" class="d-none">
-                        <div class="alert alert-light border-start border-primary border-4" role="alert">
-                            <div class="d-flex align-items-start">
-                                <i class="fas fa-lightbulb text-primary me-3 mt-1"></i>
-                                <div class="flex-grow-1">
-                                    <h6 class="alert-heading">Réponse de l'IA :</h6>
-                                    <div id="answerContent"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Demo Recommendations Section -->
-                    <div id="demoRecommendations" class="d-none">
-                        <hr class="my-4">
-                        <h6><i class="fas fa-magic text-warning me-2"></i>Démonstration en temps réel</h6>
-                        <div id="demoResults" class="row"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Analytics Overview -->
-    <div class="row mb-5">
-        <div class="col-lg-3 col-md-6 mb-4">
-            <div class="card border-0 shadow text-center h-100">
-                <div class="card-body">
-                    <i class="fas fa-film text-primary mb-3" style="font-size: 2.5rem;"></i>
-                    <h3 class="text-primary" id="totalMovies">-</h3>
-                    <p class="text-muted mb-0">Films en base</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-3 col-md-6 mb-4">
-            <div class="card border-0 shadow text-center h-100">
-                <div class="card-body">
-                    <i class="fas fa-comments text-success mb-3" style="font-size: 2.5rem;"></i>
-                    <h3 class="text-success" id="totalReviews">-</h3>
-                    <p class="text-muted mb-0">Avis utilisateurs</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-3 col-md-6 mb-4">
-            <div class="card border-0 shadow text-center h-100">
-                <div class="card-body">
-                    <i class="fas fa-users text-info mb-3" style="font-size: 2.5rem;"></i>
-                    <h3 class="text-info" id="totalUsers">-</h3>
-                    <p class="text-muted mb-0">Utilisateurs actifs</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-3 col-md-6 mb-4">
-            <div class="card border-0 shadow text-center h-100">
-                <div class="card-body">
-                    <i class="fas fa-star text-warning mb-3" style="font-size: 2.5rem;"></i>
-                    <h3 class="text-warning" id="averageRating">-</h3>
-                    <p class="text-muted mb-0">Note moyenne</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Recommendation Algorithm Explanation -->
-    <div class="row mb-5">
-        <div class="col-12">
-            <div class="card border-0 shadow">
-                <div class="card-header bg-light">
-                    <h4><i class="fas fa-brain text-purple me-2"></i>Comment nos algorithmes fonctionnent</h4>
+                    <h4><i class="fas fa-database me-2"></i>Recommandations et Statistiques</h4>
+                    <p class="mb-0">Découvrez les données et recommandations intelligentes</p>
                 </div>
                 <div class="card-body">
                     <div class="row">
-                        <div class="col-md-4 mb-3">
-                            <div class="text-center p-3 border rounded">
-                                <i class="fas fa-tags text-primary mb-3" style="font-size: 2rem;"></i>
-                                <h6>Filtrage par contenu</h6>
-                                <p class="text-muted small">Analyse des genres, réalisateurs, et thèmes des films que vous aimez</p>
-                            </div>
+                        <div class="col-lg-6 mb-4">
+                            <h5>Top Films d'Action</h5>
+                            <ul id="actionMovies" class="list-group">
+                                <!-- Dynamically populated -->
+                            </ul>
                         </div>
-                        <div class="col-md-4 mb-3">
-                            <div class="text-center p-3 border rounded">
-                                <i class="fas fa-users text-success mb-3" style="font-size: 2rem;"></i>
-                                <h6>Filtrage collaboratif</h6>
-                                <p class="text-muted small">Recommande des films aimés par des utilisateurs aux goûts similaires</p>
-                            </div>
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <div class="text-center p-3 border rounded">
-                                <i class="fas fa-project-diagram text-info mb-3" style="font-size: 2rem;"></i>
-                                <h6>Analyse de graphe</h6>
-                                <p class="text-muted small">Utilise Neo4j pour modéliser les relations complexes entre utilisateurs et films</p>
-                            </div>
+                        <div class="col-lg-6 mb-4">
+                            <h5>Meilleurs Films de Science-fiction</h5>
+                            <ul id="sciFiMovies" class="list-group">
+                                <!-- Dynamically populated -->
+                            </ul>
                         </div>
                     </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- User Profile Analysis (if authenticated) -->
-    {% if user.is_authenticated %}
-    <div class="row mb-5">
-        <div class="col-lg-8">
-            <div class="card border-0 shadow">
-                <div class="card-header">
-                    <h5><i class="fas fa-user-chart me-2"></i>Analyse de votre profil</h5>
-                </div>
-                <div class="card-body">
                     <div class="row">
-                        <div class="col-md-6">
-                            <h6>Vos genres préférés</h6>
-                            <div id="userGenres">
-                                <div class="text-muted">Chargement...</div>
-                            </div>
+                        <div class="col-lg-6 mb-4">
+                            <h5>Films Populaires Cette Semaine</h5>
+                            <ul id="popularMovies" class="list-group">
+                                <!-- Dynamically populated -->
+                            </ul>
                         </div>
-                        <div class="col-md-6">
-                            <h6>Distribution de vos notes</h6>
-                            <canvas id="ratingsChart" width="300" height="200"></canvas>
+                        <div class="col-lg-6 mb-4">
+                            <h5>Tendances des Comédies</h5>
+                            <ul id="comedyTrends" class="list-group">
+                                <!-- Dynamically populated -->
+                            </ul>
                         </div>
                     </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-4">
-            <div class="card border-0 shadow">
-                <div class="card-header">
-                    <h6><i class="fas fa-clock me-2"></i>Activité récente</h6>
-                </div>
-                <div class="card-body">
-                    <div id="recentActivity">
-                        <div class="text-muted">Chargement...</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    {% endif %}
-
-    <!-- Live Demo Section -->
-    <div class="row mb-5">
-        <div class="col-12">
-            <div class="card border-0 shadow">
-                <div class="card-header bg-warning text-dark">
-                    <h5><i class="fas fa-play-circle me-2"></i>Démonstration en direct</h5>
-                </div>
-                <div class="card-body">
                     <div class="row">
-                        <div class="col-md-6">
-                            <h6>Simuler une interaction :</h6>
-                            <div class="mb-3">
-                                <label for="demoGenre" class="form-label">Genre du film regardé :</label>
-                                <select class="form-select" id="demoGenre">
-                                    <option value="">Sélectionner un genre</option>
-                                    <option value="Action">Action</option>
-                                    <option value="Comedy">Comédie</option>
-                                    <option value="Drama">Drame</option>
-                                    <option value="Horror">Horreur</option>
-                                    <option value="Romance">Romance</option>
-                                    <option value="Sci-Fi">Science-Fiction</option>
-                                    <option value="Thriller">Thriller</option>
-                                </select>
-                            </div>
-                            <div class="mb-3">
-                                <label for="demoRating" class="form-label">Note donnée (1-5) :</label>
-                                <input type="range" class="form-range" min="1" max="5" value="4" id="demoRating">
-                                <div class="text-muted">Note : <span id="ratingValue">4</span>/5</div>
-                            </div>
-                            <button class="btn btn-warning" id="simulateInteraction">
-                                <i class="fas fa-play me-1"></i>Simuler l'interaction
-                            </button>
-                        </div>
-                        <div class="col-md-6">
-                            <h6>Résultat des recommandations :</h6>
-                            <div id="simulationResults" class="border rounded p-3 bg-light">
-                                <div class="text-muted text-center">
-                                    <i class="fas fa-arrow-left me-2"></i>
-                                    Sélectionnez un genre et cliquez sur "Simuler"
-                                </div>
-                            </div>
+                        <div class="col-lg-12 mb-4">
+                            <h5>Réalisateurs les Plus Recommandés</h5>
+                            <ul id="topDirectors" class="list-group">
+                                <!-- Dynamically populated -->
+                            </ul>
                         </div>
                     </div>
                 </div>
@@ -258,7 +63,6 @@
         </div>
     </div>
 </div>
-
 <style>
 .bg-gradient-primary {
     background: linear-gradient(45deg, #007bff, #0056b3);
@@ -272,30 +76,6 @@
     border-width: 4px !important;
 }
 
-.suggested-question {
-    transition: all 0.2s ease;
-}
-
-.suggested-question:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-}
-
-#answerSection {
-    animation: fadeInUp 0.5s ease;
-}
-
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
 .card {
     transition: transform 0.2s ease;
 }
@@ -307,393 +87,95 @@
 {% endblock %}
 
 {% block scripts %}
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize dashboard
     loadAnalytics();
-    
-    // Check if user is authenticated (passed from Django template)
-    const isAuthenticated = "{{ user.is_authenticated|yesno:'true,false' }}" === "true";
-    if (isAuthenticated) {
-        loadUserProfile();
-    }
-    
-    // Question handling
-    const questionInput = document.getElementById('questionInput');
-    const askButton = document.getElementById('askQuestion');
-    const clearButton = document.getElementById('clearQuestion');
-    const answerSection = document.getElementById('answerSection');
-    const answerContent = document.getElementById('answerContent');
-    const demoRecommendations = document.getElementById('demoRecommendations');
-    
-    // Suggested questions
-    document.querySelectorAll('.suggested-question').forEach(btn => {
-        btn.addEventListener('click', function() {
-            questionInput.value = this.dataset.question;
-            handleQuestion();
-        });
-    });
-    
-    askButton.addEventListener('click', handleQuestion);
-    clearButton.addEventListener('click', function() {
-        questionInput.value = '';
-        answerSection.classList.add('d-none');
-        demoRecommendations.classList.add('d-none');
-    });
-    
-    questionInput.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            handleQuestion();
-        }
-    });
-    
-    // Demo simulation
-    const demoRating = document.getElementById('demoRating');
-    const ratingValue = document.getElementById('ratingValue');
-    const simulateBtn = document.getElementById('simulateInteraction');
-    
-    demoRating.addEventListener('input', function() {
-        ratingValue.textContent = this.value;
-    });
-    
-    simulateBtn.addEventListener('click', simulateInteraction);
+    loadDashboardData();
 });
 
-function handleQuestion() {
-    const question = document.getElementById('questionInput').value.trim();
-    if (!question) return;
-    
-    const answerSection = document.getElementById('answerSection');
-    const answerContent = document.getElementById('answerContent');
-    const demoRecommendations = document.getElementById('demoRecommendations');
-    
-    // Show loading
-    answerContent.innerHTML = '<div class="spinner-border spinner-border-sm me-2"></div>Analyse en cours...';
-    answerSection.classList.remove('d-none');
-    
-    // Call real API
-    fetch('/movies/api/intelligent-qa/', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': getCookie('csrftoken')
-        },
-        body: JSON.stringify({
-            question: question
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            answerContent.innerHTML = data.answer;
-            
-            // Show demo movies if available
-            if (data.demo_movies && data.demo_movies.length > 0) {
-                showRealMovieDemo(data.demo_movies);
-            }
-        } else {
-            answerContent.innerHTML = '<div class="text-danger">Erreur lors du traitement de la question.</div>';
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        answerContent.innerHTML = generateAnswer(question); // Fallback to client-side
-    });
-}
-
-function showRealMovieDemo(movies) {
-    const demoRecommendations = document.getElementById('demoRecommendations');
-    const demoResults = document.getElementById('demoResults');
-    
-    let moviesHtml = '';
-    movies.forEach(movie => {
-        moviesHtml += `
-            <div class="col-md-4 mb-3">
-                <div class="card border-success h-100">
-                    <div class="card-body text-center">
-                        <h6 class="card-title">${movie.title}</h6>
-                        <p class="card-text text-muted small">${movie.genres || ''}</p>
-                        <span class="badge bg-success">${movie.rating || 'N/A'} ⭐</span>
-                    </div>
-                </div>
-            </div>
-        `;
-    });
-    
-    demoResults.innerHTML = moviesHtml;
-    demoRecommendations.classList.remove('d-none');
-}
-
-function simulateInteraction() {
-    const genre = document.getElementById('demoGenre').value;
-    const rating = document.getElementById('demoRating').value;
-    const resultsDiv = document.getElementById('simulationResults');
-    
-    if (!genre) {
-        alert('Veuillez sélectionner un genre');
-        return;
-    }
-    
-    resultsDiv.innerHTML = '<div class="text-center"><div class="spinner-border spinner-border-sm me-2"></div>Simulation en cours...</div>';
-    
-    // Call real API for simulation
-    fetch('/movies/api/intelligent-qa/', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': getCookie('csrftoken')
-        },
-        body: JSON.stringify({
-            simulate: true,
-            genre: genre,
-            rating: rating
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success && data.recommendations) {
-            let html = `
-                <div class="row">
-                    <div class="col-12">
-                        <h6 class="text-success mb-3">
-                            <i class="fas fa-check-circle me-1"></i>
-                            Recommandations pour ${genre} (note: ${rating}/5)
-                        </h6>
-                    </div>
-            `;
-            
-            data.recommendations.slice(0, 3).forEach(movie => {
-                html += `
-                    <div class="col-md-4 mb-2">
-                        <div class="card border-success">
-                            <div class="card-body p-2 text-center">
-                                <h6 class="card-title small">${movie.title}</h6>
-                                <span class="badge bg-success">${movie.rating || 'N/A'} ⭐</span>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            });
-            
-            html += '</div>';
-            resultsDiv.innerHTML = html;
-        } else {
-            resultsDiv.innerHTML = getSimulatedRecommendations(genre, rating); // Fallback
-        }
-    })
-    .catch(error => {
-        console.error('Simulation error:', error);
-        resultsDiv.innerHTML = getSimulatedRecommendations(genre, rating); // Fallback
-    });
-}
-
-function getCookie(name) {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-        const cookies = document.cookie.split(';');
-        for (let i = 0; i < cookies.length; i++) {
-            const cookie = cookies[i].trim();
-            if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
-            }
-        }
-    }
-    return cookieValue;
-}
-
-// Missing functions that are called in the template
 function loadAnalytics() {
     // Load analytics data
     fetch('/movies/api/analytics/')
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
         .then(data => {
             if (data.success) {
-                document.getElementById('totalMovies').textContent = data.total_movies || '0';
-                document.getElementById('totalReviews').textContent = data.total_reviews || '0';
-                document.getElementById('totalUsers').textContent = data.total_users || '0';
-                document.getElementById('averageRating').textContent = (data.average_rating || 0).toFixed(1);
+                document.getElementById('popularGenres').textContent = data.popular_genres || 'N/A';
+                document.getElementById('seasonalTrends').textContent = data.seasonal_trends || 'N/A';
+                document.getElementById('sentimentAnalysis').textContent = data.sentiment_analysis || 'N/A';
+                document.getElementById('userEngagement').textContent = data.user_engagement || 'N/A';
             }
         })
         .catch(error => {
             console.error('Analytics loading error:', error);
             // Set default values
-            document.getElementById('totalMovies').textContent = '150+';
-            document.getElementById('totalReviews').textContent = '500+';
-            document.getElementById('totalUsers').textContent = '50+';
-            document.getElementById('averageRating').textContent = '4.2';
+            document.getElementById('popularGenres').textContent = 'Action, Drama';
+            document.getElementById('seasonalTrends').textContent = 'Summer Hits';
+            document.getElementById('sentimentAnalysis').textContent = 'Positive';
+            document.getElementById('userEngagement').textContent = 'High';
         });
 }
 
-function loadUserProfile() {
-    // Load user profile data
-    fetch('/movies/api/user-profile/')
-        .then(response => response.json())
+function loadDashboardData() {
+    // Load dashboard data for new sections
+    fetch('/movies/api/dashboard-queries/')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
         .then(data => {
             if (data.success) {
-                displayUserGenres(data.favorite_genres || []);
-                displayRatingsChart(data.ratings_distribution || {});
-                displayRecentActivity(data.recent_activity || []);
+                populateList('actionMovies', data.action_movies);
+                populateList('sciFiMovies', data.sci_fi_movies);
+                populateList('popularMovies', data.popular_this_week);
+                populateList('comedyTrends', data.comedy_trends);
+                populateList('topDirectors', data.top_directors);
+            } else {
+                console.error('Dashboard data error:', data.error);
+                displayErrorMessage();
             }
         })
         .catch(error => {
-            console.error('User profile loading error:', error);
-            document.getElementById('userGenres').innerHTML = '<div class="text-muted">Données non disponibles</div>';
-            document.getElementById('recentActivity').innerHTML = '<div class="text-muted">Aucune activité récente</div>';
+            console.error('Error loading dashboard data:', error);
+            displayErrorMessage();
         });
 }
 
-function displayUserGenres(genres) {
-    const container = document.getElementById('userGenres');
-    if (genres.length === 0) {
-        container.innerHTML = '<div class="text-muted">Regardez des films pour voir vos genres préférés</div>';
-        return;
+function populateList(elementId, items) {
+    const list = document.getElementById(elementId);
+    list.innerHTML = '';
+    if (items.length === 0) {
+        const li = document.createElement('li');
+        li.className = 'list-group-item';
+        li.textContent = 'No data available';
+        list.appendChild(li);
+    } else {
+        items.forEach(item => {
+            const li = document.createElement('li');
+            li.className = 'list-group-item';
+            li.textContent = item.title || item.director || 'N/A';
+            list.appendChild(li);
+        });
     }
-    
-    let html = '';
-    genres.slice(0, 5).forEach(genre => {
-        html += `
-            <span class="badge bg-primary me-2 mb-2" style="font-size: 0.9rem;">
-                ${genre.name} (${genre.count})
-            </span>
-        `;
-    });
-    container.innerHTML = html;
 }
 
-function displayRatingsChart(ratingsData) {
-    const ctx = document.getElementById('ratingsChart');
-    if (!ctx) return;
-    
-    new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-            labels: ['5 étoiles', '4 étoiles', '3 étoiles', '2 étoiles', '1 étoile'],
-            datasets: [{
-                data: [
-                    ratingsData['5'] || 0,
-                    ratingsData['4'] || 0,
-                    ratingsData['3'] || 0,
-                    ratingsData['2'] || 0,
-                    ratingsData['1'] || 0
-                ],
-                backgroundColor: [
-                    '#28a745',
-                    '#20c997',
-                    '#ffc107',
-                    '#fd7e14',
-                    '#dc3545'
-                ]
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: {
-                    position: 'bottom'
-                }
-            }
-        }
+function displayErrorMessage() {
+    const sections = ['actionMovies', 'sciFiMovies', 'popularMovies', 'comedyTrends', 'topDirectors'];
+    sections.forEach(section => {
+        const list = document.getElementById(section);
+        list.innerHTML = '';
+        const li = document.createElement('li');
+        li.className = 'list-group-item text-danger';
+        li.textContent = 'Error loading data';
+        list.appendChild(li);
     });
-}
-
-function displayRecentActivity(activities) {
-    const container = document.getElementById('recentActivity');
-    if (activities.length === 0) {
-        container.innerHTML = '<div class="text-muted">Aucune activité récente</div>';
-        return;
-    }
-    
-    let html = '';
-    activities.slice(0, 5).forEach(activity => {
-        html += `
-            <div class="d-flex align-items-center mb-2">
-                <i class="fas fa-${activity.type === 'review' ? 'star' : 'bookmark'} text-warning me-2"></i>
-                <small class="text-muted">
-                    ${activity.action} "${activity.movie_title}"
-                    <br><span class="text-muted">${activity.date}</span>
-                </small>
-            </div>
-        `;
-    });
-    container.innerHTML = html;
-}
-
-function generateAnswer(question) {
-    // Fallback function for generating answers
-    const lowerQuestion = question.toLowerCase();
-    
-    if (lowerQuestion.includes('action')) {
-        return `
-            <strong>Pour les films d'action :</strong><br><br>
-            Notre système analyse vos préférences et recommande des films similaires basés sur :
-            <ul>
-                <li>Les sous-genres d'action que vous préférez</li>
-                <li>Les réalisateurs et acteurs que vous appréciez</li>
-                <li>L'intensité et le style des films que vous avez bien notés</li>
-            </ul>
-            Exemple : Si vous aimez "John Wick", nous recommanderons "Nobody" ou "Atomic Blonde".
-        `;
-    }
-    
-    if (lowerQuestion.includes('comment') || lowerQuestion.includes('système') || lowerQuestion.includes('algorithme')) {
-        return `
-            <strong>Notre système de recommandation utilise :</strong><br><br>
-            <ul>
-                <li><strong>Neo4j</strong> : Modélise les relations entre utilisateurs, films et genres</li>
-                <li><strong>Filtrage collaboratif</strong> : Trouve des utilisateurs aux goûts similaires</li>
-                <li><strong>Analyse de contenu</strong> : Compare les caractéristiques des films</li>
-                <li><strong>Apprentissage adaptatif</strong> : S'améliore avec vos interactions</li>
-            </ul>
-        `;
-    }
-    
-    return `
-        <strong>Notre système intelligent :</strong><br><br>
-        Combine plusieurs techniques d'IA pour vous proposer des recommandations personnalisées
-        basées sur vos goûts, votre historique et les tendances globales.
-    `;
-}
-
-function getSimulatedRecommendations(genre, rating) {
-    const recommendations = {
-        'Action': {
-            high: ['Mad Max: Fury Road', 'John Wick', 'Mission: Impossible'],
-            medium: ['Fast & Furious', 'Die Hard', 'The Rock'],
-            low: ['Action films populaires', 'Classiques d\'action', 'Nouveautés action']
-        },
-        'Comedy': {
-            high: ['The Grand Budapest Hotel', 'Superbad', 'Anchorman'],
-            medium: ['Step Brothers', 'Zoolander', 'Dumb and Dumber'],
-            low: ['Comédies populaires', 'Comédies romantiques', 'Stand-up specials']
-        },
-        'Drama': {
-            high: ['The Shawshank Redemption', 'Forrest Gump', 'The Godfather'],
-            medium: ['Good Will Hunting', 'Dead Poets Society', 'A Beautiful Mind'],
-            low: ['Drames psychologiques', 'Drames historiques', 'Biopics']
-        }
-    };
-    
-    const level = rating >= 4 ? 'high' : rating >= 3 ? 'medium' : 'low';
-    const movies = recommendations[genre] ? recommendations[genre][level] : ['Films similaires', 'Nouveautés du genre', 'Classiques incontournables'];
-    
-    let html = `
-        <h6 class="text-success mb-3">
-            <i class="fas fa-check-circle me-1"></i>
-            Recommandations pour "${genre}" (note: ${rating}/5)
-        </h6>
-        <ul class="list-unstyled">
-    `;
-    
-    movies.forEach(movie => {
-        html += `<li class="mb-2"><i class="fas fa-film text-warning me-2"></i>${movie}</li>`;
-    });
-    
-    html += '</ul>';
-    html += `<small class="text-muted">Basé sur votre note de ${rating}/5, le système privilégie ${rating >= 4 ? 'des films de qualité similaire' : rating >= 3 ? 'une variété de films du genre' : 'des films populaires pour vous faire découvrir le genre'}.</small>`;
-    
-    return html;
 }
 </script>
 {% endblock %}

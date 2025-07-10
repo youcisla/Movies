@@ -1,5 +1,5 @@
 from django.urls import path
-from . import views
+from movies import views
 
 app_name = 'movies'
 
@@ -45,4 +45,5 @@ urlpatterns = [
     path('api/intelligent-qa/', views.api_intelligent_qa, name='api_intelligent_qa'),
     path('api/analytics/', views.api_analytics, name='api_analytics'),
     path('api/user-profile/', views.api_user_profile, name='api_user_profile'),
+    path('api/dashboard-queries/', views.api_dashboard_queries, name='api_dashboard_queries'),
 ]

@@ -5,12 +5,14 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.http import JsonResponse
 from django.core.paginator import Paginator
-from django.db.models import Q, Avg
+from django.db.models import Q, Avg, Count
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from django.views.generic import ListView, DetailView
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.utils import timezone
+from django.db import connection
 import json
 import logging
 
@@ -946,11 +948,19 @@ def generate_intelligent_answer(question):
 def api_analytics(request):
     """API pour récupérer les statistiques générales"""
     try:
-        total_movies = Movie.objects.count()
-        total_reviews = Review.objects.count()
-        total_users = User.objects.filter(is_active=True).count()
-        average_rating = Review.objects.aggregate(Avg('rating'))['rating__avg'] or 0
-        
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT COUNT(*) FROM movies_movie")
+            total_movies = cursor.fetchone()[0]
+
+            cursor.execute("SELECT COUNT(*) FROM movies_review")
+            total_reviews = cursor.fetchone()[0]
+
+            cursor.execute("SELECT COUNT(*) FROM auth_user WHERE is_active = TRUE")
+            total_users = cursor.fetchone()[0]
+
+            cursor.execute("SELECT AVG(rating) FROM movies_review")
+            average_rating = cursor.fetchone()[0] or 0
+
         return JsonResponse({
             'success': True,
             'total_movies': total_movies,
@@ -966,48 +976,41 @@ def api_analytics(request):
 
 @csrf_exempt
 @login_required
-def api_user_profile(request):
-    """API pour récupérer les données du profil utilisateur"""
+def api_dashboard_queries(request):
+    """API to handle dashboard queries"""
     try:
-        user_reviews = Review.objects.filter(user=request.user)
-        
-        # Favorite genres based on reviews
-        favorite_genres = []
-        genre_counts = {}
-        for review in user_reviews.filter(rating__gte=4):
-            for genre in review.movie.genres.all():
-                genre_counts[genre.name] = genre_counts.get(genre.name, 0) + 1
-        
-        favorite_genres = [
-            {'name': genre, 'count': count}
-            for genre, count in sorted(genre_counts.items(), key=lambda x: x[1], reverse=True)[:5]
-        ]
-        
-        # Ratings distribution
-        ratings_distribution = {}
-        for i in range(1, 6):
-            ratings_distribution[str(i)] = user_reviews.filter(rating=i).count()
-        
-        # Recent activity
-        recent_reviews = user_reviews.order_by('-created_at')[:5]
-        recent_activity = [
-            {
-                'type': 'review',
-                'action': f'A noté {review.rating}/5',
-                'movie_title': review.movie.title,
-                'date': review.created_at.strftime('%d/%m/%Y')
-            }
-            for review in recent_reviews
-        ]
-        
+        action_movies = Movie.objects.filter(genre__name='Action')[:10]
+        sci_fi_movies = Movie.objects.filter(genre__name='Science Fiction')[:10]
+        popular_this_week = Movie.objects.order_by('-popularity')[:10]
+        comedy_trends = Movie.objects.filter(genre__name='Comedy')[:10]
+        top_directors = Director.objects.annotate(movie_count=Count('movies')).order_by('-movie_count')[:10]
+
         return JsonResponse({
             'success': True,
-            'favorite_genres': favorite_genres,
-            'ratings_distribution': ratings_distribution,
-            'recent_activity': recent_activity
+            'action_movies': [{'title': movie.title} for movie in action_movies],
+            'sci_fi_movies': [{'title': movie.title} for movie in sci_fi_movies],
+            'popular_this_week': [{'title': movie.title} for movie in popular_this_week],
+            'comedy_trends': [{'title': movie.title} for movie in comedy_trends],
+            'top_directors': [{'director': director.name} for director in top_directors]
         })
     except Exception as e:
         return JsonResponse({
             'success': False,
             'error': str(e)
         })
+
+@csrf_exempt
+@login_required
+def api_user_profile(request):
+    """API to fetch user profile details"""
+    try:
+        user = request.user
+        profile_data = {
+            'username': user.username,
+            'email': user.email,
+            'is_active': user.is_active,
+            'date_joined': user.date_joined.strftime('%Y-%m-%d'),
+        }
+        return JsonResponse({'success': True, 'profile': profile_data})
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)})
