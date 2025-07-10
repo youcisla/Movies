@@ -47,7 +47,7 @@ function setupWatchlistButtons() {
             this.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
             this.disabled = true;
             
-            fetch(`/movies/${movieId}/watchlist/`, {
+            fetch(`/movies/movies/${movieId}/watchlist/`, {
                 method: 'POST',
                 headers: {
                     'X-CSRFToken': getCookie('csrftoken'),

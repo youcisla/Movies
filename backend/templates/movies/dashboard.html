@@ -5,13 +5,12 @@
 
 {% block content %}
 <div class="container">
-    <!-- Enhanced Header with Better Contrast -->
     <div class="row mb-5">
         <div class="col-12">
             <div class="dashboard-header text-center py-5">
-                <h1 class="dashboard-title" style="color: #0f172a !important; font-weight: 900 !important; font-size: 3rem !important;">
-                    <i class="fas fa-chart-line me-3" style="color: #2563eb;"></i>
-                    Dashboard Intelligent
+                <h1 class="dashboard-title display-4 fw-bold text-dark mb-3">
+                    <i class="fas fa-chart-line me-3" style="color: #3b82f6;"></i>
+                    Dashboard Analytics
                 </h1>
                 <p class="dashboard-subtitle" style="color: #334155 !important; font-weight: 600 !important; font-size: 1.25rem !important;">
                     Analysez vos préférences et découvrez comment notre système fonctionne
@@ -68,191 +67,89 @@
         </div>
     </div>
 
-    <!-- Analytics Section -->
+    <!-- Analytics Cards -->
     <div class="row mb-5">
-        <div class="col-lg-8 mb-4">
+        <div class="col-lg-6 col-md-12 mb-4">
             <div class="analytics-card">
                 <div class="card-header">
-                    <h4><i class="fas fa-chart-area me-2"></i>Tendances de visionnage</h4>
-                    <p class="text-muted mb-0">Votre activité au cours des derniers mois</p>
+                    <h4><i class="fas fa-chart-bar me-2"></i>Top Films d'Action</h4>
+                    <p>Films d'action les plus populaires</p>
                 </div>
                 <div class="card-body">
-                    <canvas id="viewingTrendsChart" height="300"></canvas>
+                    <ul class="list-group list-group-flush" id="actionMovies">
+                        <li class="list-group-item"><i class="fas fa-spinner fa-spin me-2"></i>Chargement...</li>
+                    </ul>
                 </div>
             </div>
         </div>
-        <div class="col-lg-4 mb-4">
+        <div class="col-lg-6 col-md-12 mb-4">
             <div class="analytics-card">
                 <div class="card-header">
-                    <h4><i class="fas fa-pie-chart me-2"></i>Genres préférés</h4>
-                    <p class="text-muted mb-0">Distribution de vos goûts</p>
+                    <h4><i class="fas fa-rocket me-2"></i>Films Sci-Fi Populaires</h4>
+                    <p>Science-fiction tendance</p>
                 </div>
                 <div class="card-body">
-                    <canvas id="genreDistributionChart" height="250"></canvas>
+                    <ul class="list-group list-group-flush" id="sciFiMovies">
+                        <li class="list-group-item"><i class="fas fa-spinner fa-spin me-2"></i>Chargement...</li>
+                    </ul>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Insights Section -->
+    <!-- More Analytics -->
     <div class="row mb-5">
-        <div class="col-12">
+        <div class="col-lg-4 col-md-6 mb-4">
             <div class="insights-card">
                 <div class="card-header">
-                    <h4><i class="fas fa-lightbulb me-2"></i>Insights personnalisés</h4>
+                    <h4><i class="fas fa-fire me-2"></i>Tendances Populaires</h4>
+                    <p>Ce qui cartonne actuellement</p>
                 </div>
                 <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <div class="insight-item">
-                                <div class="insight-icon">
-                                    <i class="fas fa-trophy text-warning"></i>
-                                </div>
-                                <div class="insight-content">
-                                    <h6>Genre favori</h6>
-                                    <p class="mb-0" id="favoriteGenre">Action & Aventure</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <div class="insight-item">
-                                <div class="insight-icon">
-                                    <i class="fas fa-clock text-info"></i>
-                                </div>
-                                <div class="insight-content">
-                                    <h6>Temps de visionnage</h6>
-                                    <p class="mb-0" id="watchTime">~240 heures</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <div class="insight-item">
-                                <div class="insight-icon">
-                                    <i class="fas fa-calendar text-success"></i>
-                                </div>
-                                <div class="insight-content">
-                                    <h6>Période préférée</h6>
-                                    <p class="mb-0" id="preferredEra">Films modernes (2010+)</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <div class="insight-item">
-                                <div class="insight-icon">
-                                    <i class="fas fa-thumbs-up text-primary"></i>
-                                </div>
-                                <div class="insight-content">
-                                    <h6>Note moyenne</h6>
-                                    <p class="mb-0" id="averageRating">4.2/5 ⭐</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <ul class="list-group list-group-flush" id="popularMovies">
+                        <li class="list-group-item"><i class="fas fa-spinner fa-spin me-2"></i>Chargement...</li>
+                    </ul>
                 </div>
             </div>
         </div>
-    </div>
-
-    <!-- Recommendations Engine Info -->
-    <div class="row mb-5">
-        <div class="col-12">
-            <div class="engine-card">
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="insights-card">
                 <div class="card-header">
-                    <h4><i class="fas fa-cogs me-2"></i>Comment fonctionne votre moteur de recommandation</h4>
+                    <h4><i class="fas fa-laugh me-2"></i>Comédies Tendance</h4>
+                    <p>Pour se détendre</p>
                 </div>
                 <div class="card-body">
-                    <div class="engine-visual">
-                        <div class="row text-center">
-                            <div class="col-lg-3 mb-4">
-                                <div class="engine-step">
-                                    <div class="step-icon">
-                                        <i class="fas fa-user-cog"></i>
-                                    </div>
-                                    <h6>Analyse des préférences</h6>
-                                    <p class="small text-muted">Étude de vos notes et habitudes de visionnage</p>
-                                </div>
-                            </div>
-                            <div class="col-lg-3 mb-4">
-                                <div class="engine-step">
-                                    <div class="step-icon">
-                                        <i class="fas fa-brain"></i>
-                                    </div>
-                                    <h6>IA collaborative</h6>
-                                    <p class="small text-muted">Comparaison avec d'autres utilisateurs similaires</p>
-                                </div>
-                            </div>
-                            <div class="col-lg-3 mb-4">
-                                <div class="engine-step">
-                                    <div class="step-icon">
-                                        <i class="fas fa-filter"></i>
-                                    </div>
-                                    <h6>Filtrage avancé</h6>
-                                    <p class="small text-muted">Sélection basée sur le contenu et la popularité</p>
-                                </div>
-                            </div>
-                            <div class="col-lg-3 mb-4">
-                                <div class="engine-step">
-                                    <div class="step-icon">
-                                        <i class="fas fa-magic"></i>
-                                    </div>
-                                    <h6>Personnalisation</h6>
-                                    <p class="small text-muted">Adaptation continue selon vos retours</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <ul class="list-group list-group-flush" id="comedyTrends">
+                        <li class="list-group-item"><i class="fas fa-spinner fa-spin me-2"></i>Chargement...</li>
+                    </ul>
                 </div>
             </div>
         </div>
-    </div>
-
-    <!-- Recent Activity -->
-    <div class="row">
-        <div class="col-12">
-            <div class="activity-card">
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="insights-card">
                 <div class="card-header">
-                    <h4><i class="fas fa-history me-2"></i>Activité récente</h4>
+                    <h4><i class="fas fa-crown me-2"></i>Réalisateurs Notables</h4>
+                    <p>Les maîtres du cinéma</p>
                 </div>
                 <div class="card-body">
-                    <div class="activity-timeline">
-                        <div class="timeline-item">
-                            <div class="timeline-marker bg-primary"></div>
-                            <div class="timeline-content">
-                                <h6>Film ajouté à votre liste</h6>
-                                <p class="text-muted mb-1">Inception - Christopher Nolan</p>
-                                <small class="text-muted">Il y a 2 heures</small>
-                            </div>
-                        </div>
-                        <div class="timeline-item">
-                            <div class="timeline-marker bg-success"></div>
-                            <div class="timeline-content">
-                                <h6>Avis donné</h6>
-                                <p class="text-muted mb-1">The Dark Knight - 5/5 ⭐</p>
-                                <small class="text-muted">Hier</small>
-                            </div>
-                        </div>
-                        <div class="timeline-item">
-                            <div class="timeline-marker bg-warning"></div>
-                            <div class="timeline-content">
-                                <h6>Nouvelles recommandations</h6>
-                                <p class="text-muted mb-1">12 nouveaux films suggérés</p>
-                                <small class="text-muted">Il y a 3 jours</small>
-                            </div>
-                        </div>
-                    </div>
+                    <ul class="list-group list-group-flush" id="topDirectors">
+                        <li class="list-group-item"><i class="fas fa-spinner fa-spin me-2"></i>Chargement...</li>
+                    </ul>
                 </div>
             </div>
         </div>
     </div>
 </div>
+{% endblock %}
 
+{% block extra_css %}
 <style>
 /* Enhanced Dashboard Styles for Better Contrast and Readability */
 
 /* Cards and Stats */
 .stats-card {
-    background: #ffffff;
-    border: 2px solid #e2e8f0;
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    border: 1px solid #e2e8f0;
     border-radius: 1rem;
     padding: 1.5rem;
     transition: all 0.3s ease;
@@ -262,9 +159,8 @@
 }
 
 .stats-card:hover {
-    transform: translateY(-4px);
+    transform: translateY(-5px);
     box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-    border-color: #2563eb;
 }
 
 .stats-card::before {
@@ -274,7 +170,7 @@
     left: 0;
     right: 0;
     height: 4px;
-    background: linear-gradient(90deg, #2563eb, #7c3aed);
+    background: linear-gradient(90deg, #3b82f6, #8b5cf6);
 }
 
 .stats-content h3 {
@@ -285,10 +181,10 @@
 }
 
 .stats-content p {
-    color: #334155 !important;
+    color: #64748b !important;
     font-weight: 600 !important;
-    font-size: 1rem !important;
     margin: 0;
+    font-size: 0.9rem;
 }
 
 .stats-icon {
@@ -298,35 +194,35 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 1rem;
     font-size: 1.5rem;
     color: white;
+    margin-bottom: 1rem;
 }
 
 .stats-icon.bg-primary {
-    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
 }
 
 .stats-icon.bg-success {
-    background: linear-gradient(135deg, #059669, #047857);
+    background: linear-gradient(135deg, #10b981, #059669);
 }
 
 .stats-icon.bg-warning {
-    background: linear-gradient(135deg, #ea580c, #dc2626);
+    background: linear-gradient(135deg, #f59e0b, #d97706);
 }
 
 .stats-icon.bg-info {
-    background: linear-gradient(135deg, #0891b2, #0e7490);
+    background: linear-gradient(135deg, #06b6d4, #0891b2);
 }
 
 /* Analytics Cards */
 .analytics-card {
-    background: #ffffff;
-    border: 2px solid #e2e8f0;
+    background: white;
+    border: 1px solid #e2e8f0;
     border-radius: 1rem;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
     transition: all 0.3s ease;
+    overflow: hidden;
 }
 
 .analytics-card:hover {
@@ -335,22 +231,21 @@
 }
 
 .analytics-card .card-header {
-    background: #f8fafc;
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
     border-bottom: 2px solid #e2e8f0;
     padding: 1.5rem;
 }
 
 .analytics-card .card-header h4 {
     color: #0f172a !important;
-    font-weight: 800 !important;
-    font-size: 1.5rem !important;
+    font-weight: 700 !important;
     margin-bottom: 0.5rem;
 }
 
 .analytics-card .card-header p {
     color: #64748b !important;
-    font-weight: 500 !important;
     margin: 0;
+    font-size: 0.9rem;
 }
 
 .analytics-card .card-body {
@@ -359,143 +254,71 @@
 
 /* Insights Cards */
 .insights-card {
-    background: #ffffff;
-    border: 2px solid #e2e8f0;
+    background: white;
+    border: 1px solid #e2e8f0;
     border-radius: 1rem;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
     overflow: hidden;
 }
 
 .insights-card .card-header {
-    background: linear-gradient(135deg, #2563eb, #1d4ed8);
-    color: white;
-    padding: 1.5rem;
+    background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+    border-bottom: 2px solid #cbd5e0;
+    padding: 1.25rem;
 }
 
 .insights-card .card-header h4 {
-    color: white !important;
-    font-weight: 800 !important;
-    font-size: 1.5rem !important;
+    color: #0f172a !important;
+    font-weight: 700 !important;
     margin-bottom: 0.5rem;
+    font-size: 1.1rem;
 }
 
 .insights-card .card-header p {
-    color: rgba(255, 255, 255, 0.8) !important;
-    font-weight: 500 !important;
+    color: #64748b !important;
     margin: 0;
+    font-size: 0.85rem;
 }
 
 .insights-card .card-body {
-    padding: 1.5rem;
-}
-
-/* Timeline styles */
-.timeline-item {
-    background: #f8fafc;
-    border: 2px solid #e2e8f0;
-    border-radius: 0.75rem;
     padding: 1.25rem;
-    margin-bottom: 1rem;
-    position: relative;
-    transition: all 0.3s ease;
-}
-
-.timeline-item:hover {
-    background: #ffffff;
-    border-color: #2563eb;
-    transform: translateX(4px);
-}
-
-.timeline-item::before {
-    content: '';
-    position: absolute;
-    left: -8px;
-    top: 1.5rem;
-    width: 4px;
-    height: 4px;
-    background: #2563eb;
-    border-radius: 50%;
-}
-
-.timeline-item h6 {
-    color: #0f172a !important;
-    font-weight: 700 !important;
-    font-size: 1.125rem !important;
-    margin-bottom: 0.5rem;
-}
-
-.timeline-item p {
-    color: #475569 !important;
-    font-weight: 500 !important;
-    margin: 0;
-}
-
-.timeline-item small {
-    color: #64748b !important;
-    font-weight: 500 !important;
-}
-
-/* List group enhancements */
-.list-group-item {
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
-    color: #334155 !important;
-    font-weight: 500 !important;
-    padding: 1rem;
-    transition: all 0.3s ease;
-}
-
-.list-group-item:hover {
-    background: #f8fafc;
-    border-color: #2563eb;
-    transform: translateX(2px);
 }
 
 /* Enhanced titles and headings */
 .dashboard-title {
-    background: linear-gradient(135deg, #0f172a, #334155);
+    background: linear-gradient(135deg, #0f172a 0%, #334155 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+    text-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .dashboard-subtitle {
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-/* Responsive improvements */
-@media (max-width: 768px) {
-    .dashboard-title {
-        font-size: 2rem !important;
-    }
-    
-    .dashboard-subtitle {
-        font-size: 1rem !important;
-    }
-    
-    .stats-content h3 {
-        font-size: 2rem !important;
-    }
-    
-    .stats-icon {
-        width: 48px;
-        height: 48px;
-        font-size: 1.25rem;
-    }
-    
-    .analytics-card .card-header h4 {
-        font-size: 1.25rem !important;
-    }
+/* List group enhancements */
+.list-group-item {
+    border: none;
+    padding: 0.75rem 1rem;
+    color: #374151 !important;
+    background: transparent;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.list-group-item:hover {
+    background: #f8fafc !important;
+    color: #0f172a !important;
 }
 
 /* Animation for better UX */
 .stats-card,
 .analytics-card,
 .insights-card {
+    animation: fadeInUp 0.6s ease forwards;
     opacity: 0;
     transform: translateY(20px);
-    animation: fadeInUp 0.6s ease forwards;
 }
 
 .stats-card:nth-child(1) { animation-delay: 0.1s; }
@@ -514,155 +337,153 @@
 .stats-card:focus-within,
 .analytics-card:focus-within,
 .insights-card:focus-within {
-    outline: 2px solid #2563eb;
+    outline: 2px solid #3b82f6;
     outline-offset: 2px;
 }
-</style>
-{% endblock %}
-                        <div class="col-lg-6 mb-4">
-                            <h5>Top Films d'Action</h5>
-                            <ul id="actionMovies" class="list-group">
-                                <!-- Dynamically populated -->
-                            </ul>
-                        </div>
-                        <div class="col-lg-6 mb-4">
-                            <h5>Meilleurs Films de Science-fiction</h5>
-                            <ul id="sciFiMovies" class="list-group">
-                                <!-- Dynamically populated -->
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-lg-6 mb-4">
-                            <h5>Films Populaires Cette Semaine</h5>
-                            <ul id="popularMovies" class="list-group">
-                                <!-- Dynamically populated -->
-                            </ul>
-                        </div>
-                        <div class="col-lg-6 mb-4">
-                            <h5>Tendances des Comédies</h5>
-                            <ul id="comedyTrends" class="list-group">
-                                <!-- Dynamically populated -->
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-lg-12 mb-4">
-                            <h5>Réalisateurs les Plus Recommandés</h5>
-                            <ul id="topDirectors" class="list-group">
-                                <!-- Dynamically populated -->
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-<style>
-.bg-gradient-primary {
-    background: linear-gradient(45deg, #007bff, #0056b3);
-}
 
-.text-purple {
-    color: #6f42c1 !important;
-}
-
-.border-4 {
-    border-width: 4px !important;
-}
-
-.card {
-    transition: transform 0.2s ease;
-}
-
-.card:hover {
-    transform: translateY(-2px);
+/* Responsive improvements */
+@media (max-width: 768px) {
+    .stats-content h3 {
+        font-size: 2rem !important;
+    }
+    
+    .dashboard-title {
+        font-size: 2rem !important;
+    }
+    
+    .analytics-card .card-header,
+    .insights-card .card-header {
+        padding: 1rem;
+    }
+    
+    .analytics-card .card-body,
+    .insights-card .card-body {
+        padding: 1rem;
+    }
 }
 </style>
 {% endblock %}
 
-{% block scripts %}
+{% block extra_js %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize dashboard
-    loadAnalytics();
+    // Counter animation
+    const counters = document.querySelectorAll('.stats-number');
+    counters.forEach(counter => {
+        const target = parseInt(counter.getAttribute('data-counter'));
+        let current = 0;
+        const increment = target / 100;
+        
+        const updateCounter = () => {
+            if (current < target) {
+                current += increment;
+                counter.textContent = Math.floor(current);
+                requestAnimationFrame(updateCounter);
+            } else {
+                counter.textContent = target;
+            }
+        };
+        
+        // Start animation with delay
+        setTimeout(updateCounter, 500);
+    });
+    
+    // Load dashboard data
     loadDashboardData();
 });
 
-function loadAnalytics() {
-    // Load analytics data
-    fetch('/movies/api/analytics/')
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            return response.json();
-        })
-        .then(data => {
-            if (data.success) {
-                document.getElementById('popularGenres').textContent = data.popular_genres || 'N/A';
-                document.getElementById('seasonalTrends').textContent = data.seasonal_trends || 'N/A';
-                document.getElementById('sentimentAnalysis').textContent = data.sentiment_analysis || 'N/A';
-                document.getElementById('userEngagement').textContent = data.user_engagement || 'N/A';
-            }
-        })
-        .catch(error => {
-            console.error('Analytics loading error:', error);
-            // Set default values
-            document.getElementById('popularGenres').textContent = 'Action, Drama';
-            document.getElementById('seasonalTrends').textContent = 'Summer Hits';
-            document.getElementById('sentimentAnalysis').textContent = 'Positive';
-            document.getElementById('userEngagement').textContent = 'High';
-        });
-}
-
 function loadDashboardData() {
-    // Load dashboard data for new sections
-    fetch('/movies/api/dashboard-queries/')
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            return response.json();
-        })
-        .then(data => {
-            if (data.success) {
-                populateList('actionMovies', data.action_movies);
-                populateList('sciFiMovies', data.sci_fi_movies);
-                populateList('popularMovies', data.popular_this_week);
-                populateList('comedyTrends', data.comedy_trends);
-                populateList('topDirectors', data.top_directors);
-            } else {
-                console.error('Dashboard data error:', data.error);
-                displayErrorMessage();
-            }
-        })
-        .catch(error => {
-            console.error('Error loading dashboard data:', error);
-            displayErrorMessage();
-        });
-}
-
-function populateList(elementId, items) {
-    const list = document.getElementById(elementId);
-    list.innerHTML = '';
-    if (items.length === 0) {
-        const li = document.createElement('li');
-        li.className = 'list-group-item';
-        li.textContent = 'No data available';
-        list.appendChild(li);
-    } else {
-        items.forEach(item => {
-            const li = document.createElement('li');
-            li.className = 'list-group-item';
-            li.textContent = item.title || item.director || 'N/A';
-            list.appendChild(li);
-        });
+    try {
+        // Simulate data loading
+        setTimeout(() => {
+            populateActionMovies();
+            populateSciFiMovies();
+            populatePopularMovies();
+            populateComedyTrends();
+            populateTopDirectors();
+        }, 1000);
+    } catch (error) {
+        console.error('Error loading dashboard data:', error);
+        showErrorState();
     }
 }
 
-function displayErrorMessage() {
+function populateActionMovies() {
+    const actionMovies = [
+        'Mad Max: Fury Road',
+        'John Wick',
+        'The Dark Knight',
+        'Avengers: Endgame',
+        'Mission: Impossible'
+    ];
+    
+    populateList('actionMovies', actionMovies);
+}
+
+function populateSciFiMovies() {
+    const sciFiMovies = [
+        'Blade Runner 2049',
+        'Interstellar',
+        'The Matrix',
+        'Inception',
+        'Dune'
+    ];
+    
+    populateList('sciFiMovies', sciFiMovies);
+}
+
+function populatePopularMovies() {
+    const popularMovies = [
+        'The Shawshank Redemption',
+        'The Godfather',
+        'Pulp Fiction',
+        'The Dark Knight',
+        'Schindler\'s List'
+    ];
+    
+    populateList('popularMovies', popularMovies);
+}
+
+function populateComedyTrends() {
+    const comedyTrends = [
+        'The Grand Budapest Hotel',
+        'Superbad',
+        'The Hangover',
+        'Anchorman',
+        'Step Brothers'
+    ];
+    
+    populateList('comedyTrends', comedyTrends);
+}
+
+function populateTopDirectors() {
+    const topDirectors = [
+        'Christopher Nolan',
+        'Quentin Tarantino',
+        'Martin Scorsese',
+        'Steven Spielberg',
+        'The Coen Brothers'
+    ];
+    
+    populateList('topDirectors', topDirectors);
+}
+
+function populateList(listId, items) {
+    const list = document.getElementById(listId);
+    list.innerHTML = '';
+    
+    items.forEach((item, index) => {
+        const li = document.createElement('li');
+        li.className = 'list-group-item d-flex justify-content-between align-items-center';
+        li.innerHTML = `
+            <span>${item}</span>
+            <span class="badge bg-primary rounded-pill">${index + 1}</span>
+        `;
+        list.appendChild(li);
+    });
+}
+
+function showErrorState() {
     const sections = ['actionMovies', 'sciFiMovies', 'popularMovies', 'comedyTrends', 'topDirectors'];
     sections.forEach(section => {
         const list = document.getElementById(section);

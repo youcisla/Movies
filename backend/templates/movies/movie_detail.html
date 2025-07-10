@@ -304,7 +304,7 @@ function submitReview() {
         return;
     }
     
-    fetch(`/movies/{{ movie.id }}/review/`, {
+    fetch(`/movies/movies/{{ movie.id }}/review/`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -360,7 +360,7 @@ document.addEventListener('DOMContentLoaded', function() {
         watchlistBtn.addEventListener('click', function() {
             const movieId = this.dataset.movieId;
             
-            fetch(`/movies/${movieId}/watchlist/`, {
+            fetch(`/movies/movies/${movieId}/watchlist/`, {
                 method: 'POST',
                 headers: {
                     'X-CSRFToken': getCookie('csrftoken')

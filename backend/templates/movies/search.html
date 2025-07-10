@@ -1,0 +1,385 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+    {% if query %}
+        Résultats pour "{{ query }}" - MovieRec
+    {% else %}
+        Recherche - MovieRec
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="search-header mb-4">
+                <h1 class="h2 mb-3">
+                    {% if query %}
+                        Résultats pour "{{ query }}"
+                    {% else %}
+                        Recherche
+                    {% endif %}
+                </h1>
+                
+                <!-- Search Form -->
+                <form method="get" class="search-form">
+                    <div class="input-group mb-3">
+                        <input type="text" 
+                               name="q" 
+                               value="{{ query }}" 
+                               class="form-control form-control-lg" 
+                               placeholder="Rechercher un film..."
+                               autofocus>
+                        <button class="btn btn-primary" type="submit">
+                            <i class="fas fa-search"></i> Rechercher
+                        </button>
+                    </div>
+                </form>
+            </div>
+            
+            {% if query %}
+                <div class="search-results">
+                    {% if movies %}
+                        <p class="text-muted mb-4">
+                            {{ page_obj.paginator.count }} film{{ page_obj.paginator.count|pluralize }} trouvé{{ page_obj.paginator.count|pluralize }}
+                        </p>
+                        
+                        <div class="row">
+                            {% for movie in movies %}
+                                <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+                                    <div class="movie-card">
+                                        <div class="movie-poster">
+                                            {% if movie.poster_path %}
+                                                <img src="https://image.tmdb.org/t/p/w500{{ movie.poster_path }}" 
+                                                     alt="{{ movie.title }}" 
+                                                     class="img-fluid rounded"
+                                                     loading="lazy">
+                                            {% else %}
+                                                <div class="placeholder-poster d-flex align-items-center justify-content-center">
+                                                    <i class="fas fa-film fa-3x text-muted"></i>
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                        
+                                        <div class="movie-info p-3">
+                                            <h5 class="movie-title">
+                                                <a href="{% url 'movies:movie_detail' movie.pk %}" 
+                                                   class="text-decoration-none">
+                                                    {{ movie.title }}
+                                                </a>
+                                            </h5>
+                                            
+                                            {% if movie.release_date %}
+                                                <p class="text-muted mb-2">
+                                                    <i class="fas fa-calendar-alt me-1"></i>
+                                                    {{ movie.release_date.year }}
+                                                </p>
+                                            {% endif %}
+                                            
+                                            {% if movie.vote_average %}
+                                                <div class="rating mb-2">
+                                                    <i class="fas fa-star text-warning"></i>
+                                                    <span class="fw-bold">{{ movie.vote_average|floatformat:1 }}</span>
+                                                    <span class="text-muted">/10</span>
+                                                </div>
+                                            {% endif %}
+                                            
+                                            {% if movie.genres.all %}
+                                                <div class="genres">
+                                                    {% for genre in movie.genres.all|slice:":3" %}
+                                                        <span class="badge bg-secondary me-1">{{ genre.name }}</span>
+                                                    {% endfor %}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                        
+                                        <div class="movie-actions p-3 pt-0">
+                                            <a href="{% url 'movies:movie_detail' movie.pk %}" 
+                                               class="btn btn-primary btn-sm">
+                                                <i class="fas fa-eye me-1"></i> Voir détails
+                                            </a>
+                                            
+                                            {% if user.is_authenticated %}
+                                                <button class="btn btn-outline-secondary btn-sm ms-2 watchlist-btn" 
+                                                        data-movie-id="{{ movie.id }}">
+                                                    <i class="fas fa-bookmark me-1"></i> 
+                                                    {% if movie.id in user_watchlist %}
+                                                        Retirer
+                                                    {% else %}
+                                                        Ajouter
+                                                    {% endif %}
+                                                </button>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        
+                        <!-- Pagination -->
+                        {% if page_obj.has_other_pages %}
+                            <nav aria-label="Search results pagination">
+                                <ul class="pagination justify-content-center">
+                                    {% if page_obj.has_previous %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="?q={{ query }}&page={{ page_obj.previous_page_number }}">
+                                                <i class="fas fa-chevron-left"></i>
+                                            </a>
+                                        </li>
+                                    {% endif %}
+                                    
+                                    {% for num in page_obj.paginator.page_range %}
+                                        {% if page_obj.number == num %}
+                                            <li class="page-item active">
+                                                <span class="page-link">{{ num }}</span>
+                                            </li>
+                                        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                            <li class="page-item">
+                                                <a class="page-link" href="?q={{ query }}&page={{ num }}">{{ num }}</a>
+                                            </li>
+                                        {% endif %}
+                                    {% endfor %}
+                                    
+                                    {% if page_obj.has_next %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="?q={{ query }}&page={{ page_obj.next_page_number }}">
+                                                <i class="fas fa-chevron-right"></i>
+                                            </a>
+                                        </li>
+                                    {% endif %}
+                                </ul>
+                            </nav>
+                        {% endif %}
+                    {% else %}
+                        <div class="no-results text-center py-5">
+                            <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                            <h4 class="text-muted">Aucun résultat trouvé</h4>
+                            <p class="text-muted">Essayez avec des mots-clés différents ou vérifiez l'orthographe.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            {% else %}
+                <div class="search-help text-center py-5">
+                    <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                    <h4 class="text-muted">Que recherchez-vous ?</h4>
+                    <p class="text-muted">Entrez le nom d'un film, d'un acteur ou d'un genre pour commencer votre recherche.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.movie-card {
+    border: 1px solid #dee2e6;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    background: white;
+}
+
+.movie-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.movie-poster {
+    position: relative;
+    height: 300px;
+    overflow: hidden;
+}
+
+.movie-poster img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.placeholder-poster {
+    width: 100%;
+    height: 100%;
+    background: #f8f9fa;
+    border-radius: 0.25rem;
+}
+
+.movie-title a {
+    color: #333;
+    font-weight: 600;
+}
+
+.movie-title a:hover {
+    color: #007bff;
+}
+
+.search-form {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.search-header {
+    text-align: center;
+    padding: 2rem 0;
+}
+
+.genres .badge {
+    font-size: 0.75rem;
+}
+
+.rating {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.no-results,
+.search-help {
+    min-height: 400px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+@media (max-width: 768px) {
+    .movie-poster {
+        height: 250px;
+    }
+    
+    .search-header {
+        padding: 1rem 0;
+    }
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Add watchlist functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const watchlistButtons = document.querySelectorAll('.watchlist-btn');
+    
+    watchlistButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const movieId = this.dataset.movieId;
+            const isInWatchlist = this.textContent.trim().includes('Retirer');
+            
+            // Optimistic UI update
+            const icon = this.querySelector('i');
+            const text = this.querySelector('span') || this.childNodes[2];
+            
+            if (isInWatchlist) {
+                icon.className = 'fas fa-bookmark me-1';
+                this.innerHTML = '<i class="fas fa-bookmark me-1"></i> Ajouter';
+            } else {
+                icon.className = 'fas fa-bookmark me-1';
+                this.innerHTML = '<i class="fas fa-bookmark me-1"></i> Retirer';
+            }
+            
+            // Send request to server
+            fetch(`/movies/movies/${movieId}/watchlist/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Update button text based on response
+                    if (data.in_watchlist) {
+                        this.innerHTML = '<i class="fas fa-bookmark me-1"></i> Retirer';
+                    } else {
+                        this.innerHTML = '<i class="fas fa-bookmark me-1"></i> Ajouter';
+                    }
+                    
+                    // Show success message
+                    showToast(data.message, 'success');
+                } else {
+                    // Revert on error
+                    if (isInWatchlist) {
+                        this.innerHTML = '<i class="fas fa-bookmark me-1"></i> Retirer';
+                    } else {
+                        this.innerHTML = '<i class="fas fa-bookmark me-1"></i> Ajouter';
+                    }
+                    showToast('Erreur lors de l\'opération', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                // Revert on error
+                if (isInWatchlist) {
+                    this.innerHTML = '<i class="fas fa-bookmark me-1"></i> Retirer';
+                } else {
+                    this.innerHTML = '<i class="fas fa-bookmark me-1"></i> Ajouter';
+                }
+                showToast('Erreur lors de l\'opération', 'error');
+            });
+        });
+    });
+});
+
+// Helper function to get CSRF token
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+// Helper function to show toast notifications
+function showToast(message, type = 'info') {
+    // Create toast container if it doesn't exist
+    let toastContainer = document.getElementById('toast-container');
+    if (!toastContainer) {
+        toastContainer = document.createElement('div');
+        toastContainer.id = 'toast-container';
+        toastContainer.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            max-width: 350px;
+        `;
+        document.body.appendChild(toastContainer);
+    }
+    
+    // Create the toast
+    const toast = document.createElement('div');
+    toast.className = `alert alert-${type === 'error' ? 'danger' : type} alert-dismissible fade show`;
+    toast.style.cssText = `
+        margin-bottom: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+    `;
+    
+    toast.innerHTML = `
+        <div class="d-flex align-items-center">
+            <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-triangle' : 'info-circle'} me-2"></i>
+            <span>${message}</span>
+            <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert"></button>
+        </div>
+    `;
+    
+    toastContainer.appendChild(toast);
+    
+    // Remove automatically after 5 seconds
+    setTimeout(() => {
+        if (toast.parentNode) {
+            toast.remove();
+        }
+    }, 5000);
+}
+</script>
+{% endblock %}

@@ -159,11 +159,23 @@ class MovieListView(ListView):
         # Filtrage par année
         year = self.request.GET.get('year')
         if year:
-            queryset = queryset.filter(release_date__year=year)
+            if '-' in year:  # Year range like "2020-2024"
+                start_year, end_year = year.split('-')
+                queryset = queryset.filter(
+                    release_date__year__gte=start_year,
+                    release_date__year__lte=end_year
+                )
+            else:
+                queryset = queryset.filter(release_date__year=year)
+        
+        # Filtrage par note
+        rating = self.request.GET.get('rating')
+        if rating:
+            queryset = queryset.filter(vote_average__gte=rating)
         
         # Tri
         sort_by = self.request.GET.get('sort', '-popularity')
-        if sort_by in ['-popularity', '-vote_average', '-release_date', 'title']:
+        if sort_by in ['-popularity', '-vote_average', '-release_date', 'release_date', 'title']:
             queryset = queryset.order_by(sort_by)
         
         return queryset.distinct()
@@ -174,7 +186,17 @@ class MovieListView(ListView):
         context['current_genre'] = self.request.GET.get('genre')
         context['current_search'] = self.request.GET.get('search', '')
         context['current_year'] = self.request.GET.get('year', '')
+        context['current_rating'] = self.request.GET.get('rating', '')
         context['current_sort'] = self.request.GET.get('sort', '-popularity')
+        
+        # Add current genre name if genre is selected
+        if context['current_genre']:
+            try:
+                genre = Genre.objects.get(id=context['current_genre'])
+                context['current_genre_name'] = genre.name
+            except Genre.DoesNotExist:
+                context['current_genre_name'] = 'Genre inconnu'
+        
         return context
 
 
@@ -388,32 +410,45 @@ def watchlist(request):
 @require_http_methods(["POST"])
 def toggle_watchlist(request, movie_id):
     """Ajouter ou supprimer un film de la watchlist"""
-    movie = get_object_or_404(Movie, id=movie_id)
-    watchlist_item, created = Watchlist.objects.get_or_create(
-        user=request.user,
-        movie=movie
-    )
-    if not created:
-        watchlist_item.delete()
-        # Sync removal to Neo4j if needed
-        try:
-            neo4j_engine.record_user_interaction(
-                request.user.id, movie.id, 'remove_watchlist'
-            )
-        except Exception as e:
-            logger.warning(f"Failed to sync watchlist removal to Neo4j: {e}")
-        in_watchlist = False
-    else:
-        in_watchlist = True
-        # Sync to Neo4j when adding to watchlist
-        neo4j_engine.record_user_interaction(
-            request.user.id, movie.id, 'watchlist'
+    try:
+        movie = get_object_or_404(Movie, id=movie_id)
+        watchlist_item, created = Watchlist.objects.get_or_create(
+            user=request.user,
+            movie=movie
         )
-    
-    return JsonResponse({
-        'success': True,
-        'in_watchlist': in_watchlist
-    })
+        if not created:
+            watchlist_item.delete()
+            # Sync removal to Neo4j if needed
+            try:
+                if NEO4J_AVAILABLE and neo4j_engine:
+                    neo4j_engine.record_user_interaction(
+                        request.user.id, movie.id, 'remove_watchlist'
+                    )
+            except Exception as e:
+                logger.warning(f"Failed to sync watchlist removal to Neo4j: {e}")
+            in_watchlist = False
+        else:
+            in_watchlist = True
+            # Sync to Neo4j when adding to watchlist
+            try:
+                if NEO4J_AVAILABLE and neo4j_engine:
+                    neo4j_engine.record_user_interaction(
+                        request.user.id, movie.id, 'watchlist'
+                    )
+            except Exception as e:
+                logger.warning(f"Failed to sync watchlist addition to Neo4j: {e}")
+        
+        return JsonResponse({
+            'success': True,
+            'in_watchlist': in_watchlist,
+            'message': f'Film {"ajouté à" if in_watchlist else "retiré de"} votre liste'
+        })
+    except Exception as e:
+        logger.error(f"Error in toggle_watchlist: {e}")
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        }, status=500)
 
 
 # Recherche
@@ -423,31 +458,56 @@ def search(request):
     movies = []
     
     if query:
-        # Recherche dans la base locale
-        movies = Movie.objects.filter(
-            Q(title__icontains=query) |
-            Q(overview__icontains=query)
-        )[:20]
-        
-        # Si peu de résultats, recherche sur TMDb
-        if movies.count() < 5:
-            tmdb_results = tmdb_service.search_movies(query)
+        try:
+            # Recherche dans la base locale
+            local_movies = Movie.objects.filter(
+                Q(title__icontains=query) |
+                Q(overview__icontains=query)
+            )[:20]
             
-            if tmdb_results and 'results' in tmdb_results:
-                for movie_data in tmdb_results['results'][:10]:
-                    saved_movie = tmdb_service.save_movie_to_db(movie_data)
-                    if saved_movie and saved_movie not in movies:
-                        movies = list(movies) + [saved_movie]
+            # Convert to list for easier manipulation
+            movies = list(local_movies)
+            
+            # Si peu de résultats, recherche sur TMDb
+            if len(movies) < 5:
+                try:
+                    tmdb_results = tmdb_service.search_movies(query)
+                    
+                    if tmdb_results and 'results' in tmdb_results:
+                        existing_ids = {movie.tmdb_id for movie in movies}
+                        
+                        for movie_data in tmdb_results['results'][:10]:
+                            if movie_data.get('id') not in existing_ids:
+                                try:
+                                    saved_movie = tmdb_service.save_movie_to_db(movie_data)
+                                    if saved_movie:
+                                        movies.append(saved_movie)
+                                except Exception as e:
+                                    logger.error(f"Error saving movie from TMDb: {e}")
+                                    continue
+                except Exception as e:
+                    logger.error(f"Error fetching from TMDb: {e}")
+        except Exception as e:
+            logger.error(f"Error in search: {e}")
+            movies = []
     
     # Pagination
     paginator = Paginator(movies, 12)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     
+    # Get user's watchlist if authenticated
+    user_watchlist = []
+    if request.user.is_authenticated:
+        user_watchlist = list(Watchlist.objects.filter(
+            user=request.user
+        ).values_list('movie_id', flat=True))
+    
     context = {
         'movies': page_obj,
         'query': query,
         'page_obj': page_obj,
+        'user_watchlist': user_watchlist,
     }
     
     return render(request, 'movies/search.html', context)
